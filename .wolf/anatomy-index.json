@@ -1,0 +1,600 @@
+{
+  "version": 1,
+  "meta": {
+    "lastScanned": "2026-10-08T01:26:06.959Z",
+    "fileCount": 17,
+    "hits": 0,
+    "misses": 0,
+    "renderedHash": "052efc469f1f7752a4870108c38a338b6fe31dcb420f0fb51c59616e2c9802eb",
+    "storeUpdatedAt": "2026-10-08T01:26:06.960Z",
+    "rootHash": "9a91d43e622ac248"
+  },
+  "files": {
+    "AGENTS.md": {
+      "description": "OpenWolf",
+      "tokens": 75,
+      "hash": "e401f79554a8d796",
+      "size": 297,
+      "mtimeMs": 1791422720937.934,
+      "updatedAt": "2026-10-08T01:26:06.853Z",
+      "source": "scan"
+    },
+    "CLAUDE.md": {
+      "description": "OpenWolf",
+      "tokens": 99,
+      "hash": "074d6b42b583729a",
+      "size": 395,
+      "mtimeMs": 1791422715256.8325,
+      "updatedAt": "2026-10-08T01:26:06.854Z",
+      "source": "scan"
+    },
+    "docs/plans/alias-manager-tui.md": {
+      "description": "Implementation plan: Alias Manager TUI",
+      "tokens": 2131,
+      "hash": "017bfbf8a103f34e",
+      "size": 8533,
+      "mtimeMs": 1791422377528.8123,
+      "updatedAt": "2026-10-08T01:26:06.855Z",
+      "source": "scan"
+    },
+    "docs/plans/cli-tui-sammlung.md": {
+      "description": "Implementation plan: CLI/TUI collection for Windows, Linux, and macOS",
+      "tokens": 1562,
+      "hash": "a2a696e78ec2a2ca",
+      "size": 6259,
+      "mtimeMs": 1791422399123.196,
+      "updatedAt": "2026-10-08T01:26:06.855Z",
+      "source": "scan"
+    },
+    "docs/platform-support.md": {
+      "description": "Platform support",
+      "tokens": 704,
+      "hash": "3dfb1fd4e3bacdd6",
+      "size": 2816,
+      "mtimeMs": 1791422350027.324,
+      "updatedAt": "2026-10-08T01:26:06.855Z",
+      "source": "scan"
+    },
+    "README.md": {
+      "description": "Project documentation",
+      "tokens": 716,
+      "hash": "62a5f924072d94c5",
+      "size": 2863,
+      "mtimeMs": 1791422313183.6704,
+      "updatedAt": "2026-10-08T01:26:06.855Z",
+      "source": "scan"
+    },
+    "tools/_template/README.md": {
+      "description": "Project documentation",
+      "tokens": 171,
+      "hash": "989023361d7fc516",
+      "size": 681,
+      "mtimeMs": 1791422313185.9607,
+      "updatedAt": "2026-10-08T01:26:06.856Z",
+      "source": "scan"
+    },
+    "tools/_template/src/.gitkeep": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1791370509805.7861,
+      "updatedAt": "2026-10-08T01:26:06.856Z",
+      "source": "scan"
+    },
+    "tools/_template/tests/.gitkeep": {
+      "description": "",
+      "tokens": 0,
+      "hash": "e3b0c44298fc1c14",
+      "size": 0,
+      "mtimeMs": 1791370509806.7861,
+      "updatedAt": "2026-10-08T01:26:06.856Z",
+      "source": "scan"
+    },
+    "tools/_template/tool.toml": {
+      "description": "",
+      "tokens": 85,
+      "hash": "6c54683c85e6f550",
+      "size": 296,
+      "mtimeMs": 1791422416942.5127,
+      "updatedAt": "2026-10-08T01:26:06.857Z",
+      "source": "scan"
+    },
+    "tools/alias-manager/.gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 3,
+      "hash": "306fd52e74fca674",
+      "size": 9,
+      "mtimeMs": 1791371291236.9111,
+      "updatedAt": "2026-10-08T01:26:06.859Z",
+      "source": "scan"
+    },
+    "tools/alias-manager/Cargo.toml": {
+      "description": "Rust package manifest",
+      "tokens": 91,
+      "hash": "423c249ba12b6c33",
+      "size": 317,
+      "mtimeMs": 1791370952505.0034,
+      "updatedAt": "2026-10-08T01:26:06.859Z",
+      "source": "scan"
+    },
+    "tools/alias-manager/README.md": {
+      "description": "Project documentation",
+      "tokens": 1243,
+      "hash": "c151c682a99bcbac",
+      "size": 4978,
+      "mtimeMs": 1791422332997.022,
+      "updatedAt": "2026-10-08T01:26:06.859Z",
+      "source": "scan"
+    },
+    "tools/alias-manager/src/lib.rs": {
+      "description": "Alias: as_str, new, matches, changed + 14 more",
+      "tokens": 8627,
+      "hash": "f2de094da0a68c13",
+      "size": 30192,
+      "mtimeMs": 1791421048886.4084,
+      "updatedAt": "2026-10-08T01:26:06.862Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "Shell",
+          "kind": "class",
+          "startLine": 20,
+          "endLine": 23,
+          "tokens": 11
+        },
+        {
+          "name": "Shell",
+          "kind": "section",
+          "startLine": 25,
+          "endLine": 32,
+          "tokens": 46
+        },
+        {
+          "name": "Shell.as_str",
+          "kind": "method",
+          "startLine": 26,
+          "endLine": 31,
+          "tokens": 42
+        },
+        {
+          "name": "Shell",
+          "kind": "section",
+          "startLine": 34,
+          "endLine": 38,
+          "tokens": 43
+        },
+        {
+          "name": "Shell.fmt",
+          "kind": "method",
+          "startLine": 35,
+          "endLine": 37,
+          "tokens": 33
+        },
+        {
+          "name": "FromStr",
+          "kind": "section",
+          "startLine": 40,
+          "endLine": 50,
+          "tokens": 93
+        },
+        {
+          "name": "FromStr.from_str",
+          "kind": "method",
+          "startLine": 43,
+          "endLine": 49,
+          "tokens": 76
+        },
+        {
+          "name": "Alias",
+          "kind": "class",
+          "startLine": 53,
+          "endLine": 57,
+          "tokens": 26
+        },
+        {
+          "name": "AliasStore",
+          "kind": "class",
+          "startLine": 60,
+          "endLine": 65,
+          "tokens": 34
+        },
+        {
+          "name": "AliasKey",
+          "kind": "class",
+          "startLine": 68,
+          "endLine": 71,
+          "tokens": 20
+        },
+        {
+          "name": "AliasKey",
+          "kind": "section",
+          "startLine": 73,
+          "endLine": 84,
+          "tokens": 81
+        },
+        {
+          "name": "AliasKey.new",
+          "kind": "method",
+          "startLine": 74,
+          "endLine": 79,
+          "tokens": 42
+        },
+        {
+          "name": "AliasKey.matches",
+          "kind": "method",
+          "startLine": 81,
+          "endLine": 83,
+          "tokens": 34
+        },
+        {
+          "name": "DiscoveredAlias",
+          "kind": "class",
+          "startLine": 87,
+          "endLine": 91,
+          "tokens": 28
+        },
+        {
+          "name": "ProfileUpdate",
+          "kind": "class",
+          "startLine": 94,
+          "endLine": 101,
+          "tokens": 56
+        },
+        {
+          "name": "ProfileUpdate",
+          "kind": "section",
+          "startLine": 103,
+          "endLine": 107,
+          "tokens": 30
+        },
+        {
+          "name": "ProfileUpdate.changed",
+          "kind": "method",
+          "startLine": 104,
+          "endLine": 106,
+          "tokens": 23
+        },
+        {
+          "name": "default_shell",
+          "kind": "fn",
+          "startLine": 109,
+          "endLine": 114,
+          "tokens": 45
+        },
+        {
+          "name": "default_config_dir",
+          "kind": "fn",
+          "startLine": 116,
+          "endLine": 137,
+          "tokens": 206
+        },
+        {
+          "name": "default_profile",
+          "kind": "fn",
+          "startLine": 139,
+          "endLine": 152,
+          "tokens": 114
+        },
+        {
+          "name": "aliases_store_path",
+          "kind": "fn",
+          "startLine": 154,
+          "endLine": 156,
+          "tokens": 28
+        },
+        {
+          "name": "generated_aliases_path",
+          "kind": "fn",
+          "startLine": 158,
+          "endLine": 160,
+          "tokens": 40
+        },
+        {
+          "name": "load_aliases",
+          "kind": "fn",
+          "startLine": 162,
+          "endLine": 164,
+          "tokens": 33
+        },
+        {
+          "name": "load_alias_state",
+          "kind": "fn",
+          "startLine": 166,
+          "endLine": 187,
+          "tokens": 248
+        },
+        {
+          "name": "persist_aliases",
+          "kind": "fn",
+          "startLine": 189,
+          "endLine": 191,
+          "tokens": 37
+        },
+        {
+          "name": "persist_alias_state",
+          "kind": "fn",
+          "startLine": 193,
+          "endLine": 226,
+          "tokens": 343
+        },
+        {
+          "name": "validate_alias",
+          "kind": "fn",
+          "startLine": 228,
+          "endLine": 234,
+          "tokens": 57
+        },
+        {
+          "name": "validate_alias_name",
+          "kind": "fn",
+          "startLine": 236,
+          "endLine": 245,
+          "tokens": 91
+        },
+        {
+          "name": "validate_alias_keys",
+          "kind": "fn",
+          "startLine": 247,
+          "endLine": 258,
+          "tokens": 121
+        },
+        {
+          "name": "validate_aliases",
+          "kind": "fn",
+          "startLine": 260,
+          "endLine": 273,
+          "tokens": 140
+        }
+      ],
+      "symbolSource": "ts",
+      "skeleton": "pub enum Shell {\nimpl Shell {\n    pub fn as_str(self) -> &'static str {\nimpl std::fmt::Display for Shell {\n    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\nimpl FromStr for Shell {\n    fn from_str(value: &str) -> Result<Self> {\npub struct Alias {\nstruct AliasStore {\npub struct AliasKey {\nimpl AliasKey {\n    pub fn new(shell: Shell, name: impl Into<String>) -> Self {\n    pub fn matches(&self, alias: &Alias) -> bool {\npub struct DiscoveredAlias {\npub struct ProfileUpdate {\nimpl ProfileUpdate {\n    pub fn changed(&self) -> bool {\npub fn default_shell() -> Shell {\npub fn default_config_dir() -> Result<PathBuf> {\npub fn default_profile(shell: Shell) -> Result<PathBuf> {\npub fn aliases_store_path(config_dir: &Path) -> PathBuf {\npub fn generated_aliases_path(config_dir: &Path, shell: Shell) -> PathBuf {\npub fn load_aliases(path: &Path) -> Result<Vec<Alias>> {\npub fn load_alias_state(path: &Path) -> Result<(Vec<Alias>, Vec<AliasKey>)> {\npub fn persist_aliases(config_dir: &Path, aliases: &[Alias]) -> Result<()> {\npub fn persist_alias_state(\npub fn validate_alias(alias: &Alias) -> Result<()> {\nfn validate_alias_name(name: &str) -> Result<()> {\nfn validate_alias_keys(keys: &[AliasKey]) -> Result<()> {\npub fn validate_aliases(aliases: &[Alias]) -> Result<()> {"
+    },
+    "tools/alias-manager/src/main.rs": {
+      "description": "Declares Change",
+      "tokens": 10831,
+      "hash": "2bda0d8f2402bf54",
+      "size": 37967,
+      "mtimeMs": 1791421028078.1016,
+      "updatedAt": "2026-10-08T01:26:06.865Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "Options",
+          "kind": "class",
+          "startLine": 26,
+          "endLine": 31,
+          "tokens": 31
+        },
+        {
+          "name": "Change",
+          "kind": "class",
+          "startLine": 34,
+          "endLine": 38,
+          "tokens": 28
+        },
+        {
+          "name": "Field",
+          "kind": "class",
+          "startLine": 41,
+          "endLine": 44,
+          "tokens": 11
+        },
+        {
+          "name": "EditorPhase",
+          "kind": "class",
+          "startLine": 47,
+          "endLine": 50,
+          "tokens": 14
+        },
+        {
+          "name": "Editor",
+          "kind": "class",
+          "startLine": 52,
+          "endLine": 61,
+          "tokens": 59
+        },
+        {
+          "name": "Editor",
+          "kind": "section",
+          "startLine": 63,
+          "endLine": 123,
+          "tokens": 507
+        },
+        {
+          "name": "Editor.create",
+          "kind": "method",
+          "startLine": 64,
+          "endLine": 75,
+          "tokens": 89
+        },
+        {
+          "name": "Editor.edit",
+          "kind": "method",
+          "startLine": 77,
+          "endLine": 88,
+          "tokens": 113
+        },
+        {
+          "name": "Editor.candidate",
+          "kind": "method",
+          "startLine": 90,
+          "endLine": 96,
+          "tokens": 52
+        },
+        {
+          "name": "Editor.as_change",
+          "kind": "method",
+          "startLine": 98,
+          "endLine": 107,
+          "tokens": 88
+        },
+        {
+          "name": "Editor.display_value",
+          "kind": "method",
+          "startLine": 109,
+          "endLine": 122,
+          "tokens": 161
+        },
+        {
+          "name": "insert_character",
+          "kind": "fn",
+          "startLine": 125,
+          "endLine": 132,
+          "tokens": 71
+        },
+        {
+          "name": "delete_before_cursor",
+          "kind": "fn",
+          "startLine": 134,
+          "endLine": 149,
+          "tokens": 122
+        },
+        {
+          "name": "Screen",
+          "kind": "class",
+          "startLine": 151,
+          "endLine": 155,
+          "tokens": 19
+        },
+        {
+          "name": "App",
+          "kind": "class",
+          "startLine": 157,
+          "endLine": 168,
+          "tokens": 73
+        },
+        {
+          "name": "AliasRow",
+          "kind": "class",
+          "startLine": 171,
+          "endLine": 174,
+          "tokens": 17
+        },
+        {
+          "name": "App",
+          "kind": "section",
+          "startLine": 176,
+          "endLine": 502,
+          "tokens": 3849
+        },
+        {
+          "name": "App.with_discovered",
+          "kind": "method",
+          "startLine": 177,
+          "endLine": 196,
+          "tokens": 157
+        },
+        {
+          "name": "App.effective_rows",
+          "kind": "method",
+          "startLine": 198,
+          "endLine": 234,
+          "tokens": 361
+        },
+        {
+          "name": "App.visible_rows",
+          "kind": "method",
+          "startLine": 236,
+          "endLine": 246,
+          "tokens": 115
+        },
+        {
+          "name": "App.visible_aliases",
+          "kind": "method",
+          "startLine": 248,
+          "endLine": 253,
+          "tokens": 46
+        },
+        {
+          "name": "App.selected_alias",
+          "kind": "method",
+          "startLine": 255,
+          "endLine": 257,
+          "tokens": 32
+        },
+        {
+          "name": "App.handle_key",
+          "kind": "method",
+          "startLine": 259,
+          "endLine": 455,
+          "tokens": 2581
+        },
+        {
+          "name": "App.commit",
+          "kind": "method",
+          "startLine": 457,
+          "endLine": 501,
+          "tokens": 552
+        },
+        {
+          "name": "ensure_suppressed",
+          "kind": "fn",
+          "startLine": 504,
+          "endLine": 508,
+          "tokens": 41
+        },
+        {
+          "name": "main",
+          "kind": "fn",
+          "startLine": 510,
+          "endLine": 539,
+          "tokens": 229
+        },
+        {
+          "name": "parse_options",
+          "kind": "fn",
+          "startLine": 541,
+          "endLine": 581,
+          "tokens": 370
+        },
+        {
+          "name": "print_help",
+          "kind": "fn",
+          "startLine": 583,
+          "endLine": 587,
+          "tokens": 101
+        },
+        {
+          "name": "run_setup",
+          "kind": "fn",
+          "startLine": 589,
+          "endLine": 623,
+          "tokens": 355
+        },
+        {
+          "name": "run_tui",
+          "kind": "fn",
+          "startLine": 625,
+          "endLine": 665,
+          "tokens": 437
+        }
+      ],
+      "symbolSource": "ts",
+      "skeleton": "struct Options {\nenum Change {\nenum Field {\nenum EditorPhase {\nstruct Editor {\nimpl Editor {\n    fn create() -> Self {\n    fn edit(alias: Alias) -> Self {\n    fn candidate(&self, shell: Shell) -> Alias {\n    fn as_change(&self, shell: Shell) -> Change {\n    fn display_value(&self, field: Field) -> String {\nfn insert_character(value: &mut String, cursor: &mut usize, ch: char) {\nfn delete_before_cursor(value: &mut String, cursor: &mut usize) {\nenum Screen {\nstruct App {\nstruct AliasRow {\nimpl App {\n    fn with_discovered(\n    fn effective_rows(&self) -> Vec<AliasRow> {\n    fn visible_rows(&self) -> Vec<AliasRow> {\n    fn visible_aliases(&self) -> Vec<Alias> {\n    fn selected_alias(&self) -> Option<Alias> {\n    fn handle_key(&mut self, key: KeyEvent) -> bool {\n    fn commit(&mut self, change: Change) -> Result<()> {\nfn ensure_suppressed(suppressed: &mut Vec<AliasKey>, key: AliasKey) {\nfn main() -> Result<()> {\nfn parse_options() -> Result<Options> {\nfn print_help() {\nfn run_setup(\nfn run_tui("
+    },
+    "tools/alias-manager/tool.toml": {
+      "description": "",
+      "tokens": 162,
+      "hash": "9ae663581cb98dc6",
+      "size": 567,
+      "mtimeMs": 1791422333012.0222,
+      "updatedAt": "2026-10-08T01:26:06.866Z",
+      "source": "scan"
+    },
+    "tools/README.md": {
+      "description": "Project documentation",
+      "tokens": 215,
+      "hash": "d9bae092e205f4b8",
+      "size": 859,
+      "mtimeMs": 1791422313184.6704,
+      "updatedAt": "2026-10-08T01:26:06.866Z",
+      "source": "scan"
+    }
+  },
+  "preamble": [
+    "> Project structure index. Auto-maintained by OpenWolf hooks and daemon.",
+    "> Run `openwolf scan` to generate, or wait for the first Claude Code session.",
+    "> Status: Pending initial scan"
+  ]
+}

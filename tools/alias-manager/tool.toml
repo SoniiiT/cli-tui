@@ -1,0 +1,17 @@
+id = "alias-manager"
+name = "Alias Manager"
+purpose = "Fullscreen TUI for discovering and managing Bash and Zsh aliases from shell profiles, with preview and confirmation."
+runtime = []
+build = ["Rust stable (Cargo)"]
+
+[platforms.windows]
+status = "unsupported"
+evidence = ""
+
+[platforms.linux]
+status = "supported"
+evidence = "Omarchy 4.0.4, Linux 7.2.5-3-omarchy x86_64, 2026-10-08: cargo test (13 passed), cargo clippy, cargo build --release, cargo install; Bash profile setup and alias activation verified."
+
+[platforms.macos]
+status = "unverified"
+evidence = ""

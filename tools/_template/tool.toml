@@ -1,0 +1,17 @@
+id = "replace-with-stable-tool-id"
+name = "<Tool name>"
+purpose = "TODO: Briefly describe the use case."
+runtime = []
+build = []
+
+[platforms.windows]
+status = "unverified"
+evidence = ""
+
+[platforms.linux]
+status = "unverified"
+evidence = ""
+
+[platforms.macos]
+status = "unverified"
+evidence = ""

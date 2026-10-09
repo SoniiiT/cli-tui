@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "alias-manager-parent-shell-alias-refresh",
+      "timestamp": "2026-10-08",
+      "error_message": "A newly saved alias was not available in the shell that launched the TUI.",
+      "file": "tools/alias-manager/src/lib.rs",
+      "root_cause": "The TUI runs as a child process and cannot mutate the parent shell; the existing shell had not loaded the new profile wrapper.",
+      "fix": "Install a profile-managed alias-manager function that sources the generated alias file after successful exit; reload the profile once in already-running shells.",
+      "tags": ["alias-manager", "shell-integration"],
+      "occurrences": 1,
+      "last_seen": "2026-10-08"
+    }
+  ]
+}
