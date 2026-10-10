@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+data_roots="${OPENCODE_DATA_DIR:-$HOME/.local/share/opencode}"
+data_root="${data_roots%%,*}"
+source_db="${MEMEX_OPENCODE_SOURCE_DB:-${data_root%/}/opencode.db}"
+sidecar_db="${MEMEX_OPENCODE_SIDECAR_DB:-${data_root%/}/opencode-memex-legacy.db}"
+state_file="${sidecar_db}.fingerprint"
+lock_file="${sidecar_db}.lock"
+tmp_db=""
+tmp_state=""
+
+note() {
+  if [[ "${MEMEX_OPENCODE_SNAPSHOT_VERBOSE:-0}" == 1 ]]; then
+    printf 'memex-opencode-snapshot: %s\n' "$1" >&2
+  fi
+}
+
+run_wrapped_command() {
+  export OPENCODE_DATA_DIR="$data_roots"
+  if (($# > 0)); then
+    exec "$@"
+  fi
+}
+
+if [[ ! -r "$source_db" ]]; then
+  run_wrapped_command "$@"
+  exit 0
+fi
+
+for dependency in sqlite3 flock stat; do
+  if ! command -v "$dependency" >/dev/null 2>&1; then
+    printf 'memex-opencode-snapshot: required command not found: %s\n' "$dependency" >&2
+    exit 1
+  fi
+done
+
+exec 9>"$lock_file"
+flock 9
+
+source_fingerprint() {
+  stat -Lc '%n|%s|%i|%y|%z' "$source_db"
+  if [[ -e "${source_db}-wal" ]]; then
+    stat -Lc '%n|%s|%i|%y|%z' "${source_db}-wal"
+  else
+    printf '%s|missing\n' "${source_db}-wal"
+  fi
+}
+
+cleanup() {
+  if [[ -n "$tmp_db" ]]; then
+    rm -f -- "$tmp_db" "${tmp_db}-wal" "${tmp_db}-shm" "${tmp_db}-journal"
+  fi
+  if [[ -n "$tmp_state" ]]; then
+    rm -f -- "$tmp_state"
+  fi
+}
+trap cleanup EXIT
+
+before="$(source_fingerprint)"
+if [[ -r "$sidecar_db" && -r "$state_file" ]]; then
+  cached="$(<"$state_file")"
+  if [[ "$cached" == "$before" ]]; then
+    note "snapshot already current"
+    flock -u 9
+    exec 9>&-
+    run_wrapped_command "$@"
+    exit 0
+  fi
+fi
+
+tmp_db="$(mktemp "${sidecar_db}.tmp.XXXXXX")"
+sqlite3 -readonly "$source_db" ".backup '$tmp_db'"
+
+# Only this host's legacy layout has an empty projection but no separate v2 session table.
+# Preserve all other v2 projections so a future populated or explicitly v2 database stays intact.
+has_projection="$(sqlite3 -readonly "$tmp_db" \
+  "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'session_message')")"
+if [[ "$has_projection" == 1 ]]; then
+  projection_rows="$(sqlite3 -readonly "$tmp_db" 'SELECT count(*) FROM session_message')"
+  has_v2_sessions="$(sqlite3 -readonly "$tmp_db" \
+    "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'session_v2')")"
+  if [[ "$projection_rows" == 0 && "$has_v2_sessions" == 0 ]]; then
+    sqlite3 "$tmp_db" 'DROP TABLE session_message'
+    note "removed the empty legacy projection from the snapshot only"
+  fi
+fi
+
+sqlite3 "$tmp_db" 'PRAGMA wal_checkpoint(TRUNCATE); PRAGMA journal_mode=DELETE;' >/dev/null
+mv -f -- "$tmp_db" "$sidecar_db"
+
+after="$(source_fingerprint)"
+tmp_state="$(mktemp "${state_file}.tmp.XXXXXX")"
+printf '%s\n' "$after" > "$tmp_state"
+mv -f -- "$tmp_state" "$state_file"
+tmp_state=""
+
+note "snapshot refreshed"
+flock -u 9
+exec 9>&-
+run_wrapped_command "$@"

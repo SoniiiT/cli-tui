@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""
+Sync Venice AI's live model catalog into OpenCode's provider config
+(~/.config/opencode/opencode.json). Adds models Venice has added,
+removes models Venice has retired, updates pricing/limits for the rest.
+
+Fails soft: on any fetch error, leaves the existing config untouched and
+warns, so a network hiccup never blocks starting OpenCode.
+"""
+import json
+import os
+import re
+import sys
+import urllib.error
+import urllib.request
+from datetime import datetime
+
+VENICE_MODELS_URL = "https://api.venice.ai/api/v1/models"
+CONFIG_PATH = os.path.expanduser("~/.config/opencode/opencode.json")
+BACKUP_DIR = os.path.expanduser("~/.config/opencode/.backups")
+QUIET = "--quiet" in sys.argv or "-q" in sys.argv
+INPUT_CONTEXT_SAFETY_BUFFER = 42_000
+INPUT_CONTEXT_PATTERN = re.compile(
+    r"\b(?P<tokens>[\d,.]+)\s*(?P<unit>[KM])\s+input\b", re.IGNORECASE
+)
+# Venice describes this variant as a 1.05M total window but omits the
+# 922K-input/128K-output split published for the standard GPT-6 Astra model.
+TOTAL_WINDOW_CONTEXT_MODELS = {"openai-gpt-6-astra-pro"}
+
+
+def log(msg):
+    if not QUIET:
+        print(msg, file=sys.stderr)
+
+
+def fetch_venice_models():
+    headers = {"Accept": "application/json"}
+    api_key = os.environ.get("VENICE_API_KEY")
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    req = urllib.request.Request(VENICE_MODELS_URL, headers=headers)
+    with urllib.request.urlopen(req, timeout=8) as resp:
+        data = json.load(resp)
+    return data["data"]
+
+
+def context_limit(model, spec):
+    context = model.get(
+        "context_length", spec.get("availableContextTokens", 128000)
+    )
+    model_id = model.get("id", "")
+    description = spec.get("description", "")
+    explicit_input = INPUT_CONTEXT_PATTERN.search(description)
+
+    if explicit_input:
+        multiplier = 1_000 if explicit_input.group("unit").upper() == "K" else 1_000_000
+        input_limit = int(float(explicit_input.group("tokens").replace(",", "")) * multiplier)
+    elif model_id in TOTAL_WINDOW_CONTEXT_MODELS:
+        # This description gives the combined context window, not the prompt
+        # allowance. Subtract the published maximum completion size.
+        input_limit = context - spec.get("maxCompletionTokens", 0)
+    else:
+        return context
+
+    # Leave room for hidden/system prompt overhead and tokenizer differences so
+    # OpenCode compacts before Venice rejects a near-limit prompt.
+    return max(1, input_limit - INPUT_CONTEXT_SAFETY_BUFFER)
+
+
+def to_opencode_model(model):
+    spec = model.get("model_spec", {})
+    capabilities = spec.get("capabilities", {})
+    pricing = spec.get("pricing", {})
+
+    modalities_in = ["text"]
+    if capabilities.get("supportsVision"):
+        modalities_in.append("image")
+    if capabilities.get("supportsAudioInput"):
+        modalities_in.append("audio")
+    if capabilities.get("supportsVideoInput"):
+        modalities_in.append("video")
+
+    entry = {
+        "name": spec.get("name", model["id"]),
+        "reasoning": bool(capabilities.get("supportsReasoning", False)),
+        "tool_call": bool(capabilities.get("supportsFunctionCalling", False)),
+        "modalities": {"input": modalities_in, "output": ["text"]},
+        "limit": {
+            "context": context_limit(model, spec),
+            "output": spec.get("maxCompletionTokens", 4096),
+        },
+        "cost": {
+            "input": pricing.get("input", {}).get("usd", 0),
+            "output": pricing.get("output", {}).get("usd", 0),
+        },
+    }
+    cache_input = pricing.get("cache_input", {}).get("usd")
+    if cache_input is not None:
+        entry["cost"]["cache_read"] = cache_input
+    cache_write = pricing.get("cache_write", {}).get("usd")
+    if cache_write is not None:
+        entry["cost"]["cache_write"] = cache_write
+
+    extended = pricing.get("extended")
+    if extended:
+        tier = {
+            "input": extended.get("input", {}).get("usd", 0),
+            "output": extended.get("output", {}).get("usd", 0),
+        }
+        extended_cache_input = extended.get("cache_input", {}).get("usd")
+        if extended_cache_input is not None:
+            tier["cache_read"] = extended_cache_input
+        extended_cache_write = extended.get("cache_write", {}).get("usd")
+        if extended_cache_write is not None:
+            tier["cache_write"] = extended_cache_write
+        # OpenCode's model schema exposes a fixed context_over_200k tier. It
+        # cannot represent Venice's per-model threshold when it differs from
+        # 200K, but retaining the tier rates is more accurate for long prompts.
+        entry["cost"]["context_over_200k"] = tier
+    return entry
+
+
+def main():
+    if not os.path.exists(CONFIG_PATH):
+        log(f"venice-model-sync: no config at {CONFIG_PATH}, skipping.")
+        return 0
+
+    # OpenCode config may be Stow-managed. Resolve the file symlink before the
+    # atomic replace below, otherwise os.replace() replaces the symlink itself
+    # and silently disconnects the live config from the dotfiles repository.
+    config_write_path = os.path.realpath(CONFIG_PATH)
+
+    try:
+        raw_models = fetch_venice_models()
+    except (urllib.error.URLError, TimeoutError, OSError, json.JSONDecodeError) as error:
+        log(f"venice-model-sync: couldn't reach Venice ({error}), keeping existing model list.")
+        return 0
+
+    with open(CONFIG_PATH, encoding="utf-8") as config_file:
+        config = json.load(config_file)
+
+    venice_config = config.get("provider", {}).get("venice")
+    if venice_config is None:
+        log("venice-model-sync: no provider.venice block in opencode.json, skipping.")
+        return 0
+
+    old_models = venice_config.get("models", {})
+    new_models = {model["id"]: to_opencode_model(model) for model in raw_models}
+
+    added = sorted(set(new_models) - set(old_models))
+    removed = sorted(set(old_models) - set(new_models))
+    changed = sorted(
+        model_id
+        for model_id in (set(new_models) & set(old_models))
+        if old_models[model_id] != new_models[model_id]
+    )
+
+    if not added and not removed and not changed:
+        log("venice-model-sync: model list already up to date.")
+        return 0
+
+    os.makedirs(BACKUP_DIR, exist_ok=True)
+    stamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    backup_path = os.path.join(BACKUP_DIR, f"opencode.json.{stamp}.bak")
+    with open(backup_path, "w", encoding="utf-8") as backup_file:
+        json.dump(config, backup_file, indent=2)
+
+    venice_config["models"] = new_models
+    config["provider"]["venice"] = venice_config
+
+    tmp_path = config_write_path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as config_file:
+        json.dump(config, config_file, indent=2)
+        config_file.write("\n")
+    os.replace(tmp_path, config_write_path)
+
+    if added:
+        log(
+            f"venice-model-sync: + {len(added)} added: {', '.join(added[:8])}"
+            + (" ..." if len(added) > 8 else "")
+        )
+    if removed:
+        log(
+            f"venice-model-sync: - {len(removed)} removed: {', '.join(removed[:8])}"
+            + (" ..." if len(removed) > 8 else "")
+        )
+    if changed:
+        log(f"venice-model-sync: ~ {len(changed)} updated (pricing/limits)")
+    log(f"venice-model-sync: backup saved to {backup_path}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

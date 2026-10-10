@@ -1,0 +1,69 @@
+id = "soniiit.github-ops"
+name = "GitHub Ops"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Browse GitHub issues, pull requests, tags, releases, and Actions runs; act on them and delegate isolated agent worktrees."
+platforms = ["linux", "macos"]
+
+[[build]]
+command = ["bash", "bin/build-ghzinga.sh"]
+
+[[panes]]
+id = "ops"
+title = "GitHub Ops"
+placement = "zoomed"
+command = ["sh", "-c", "exec node \"$HERDR_PLUGIN_ROOT/bin/board.mjs\""]
+
+[[panes]]
+id = "agent"
+title = "GitHub Ops Agent"
+placement = "zoomed"
+command = ["bash", "--noprofile", "--norc", "-i"]
+
+[[actions]]
+id = "open"
+title = "GitHub Ops: browse issues and pull requests"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "browse"]
+
+[[actions]]
+id = "approve"
+title = "GitHub Ops: approve a pull request"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "approve"]
+
+[[actions]]
+id = "delegate"
+title = "GitHub Ops: delegate an issue or PR review"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "delegate"]
+
+[[actions]]
+id = "create-tag"
+title = "GitHub Ops: create a tag"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "create-tag"]
+
+[[actions]]
+id = "create-release"
+title = "GitHub Ops: create a release"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "create-release"]
+
+[[actions]]
+id = "trigger-workflow"
+title = "GitHub Ops: trigger a workflow run"
+contexts = ["workspace", "tab", "pane"]
+command = ["node", "bin/open.mjs", "trigger-workflow"]
+
+[[link_handlers]]
+id = "github-issue-pr"
+title = "Open in GitHub Ops"
+pattern = "^https://github\\.com/[^/]+/[^/]+/(issues|pull)/[0-9]+([/?#].*)?$"
+action = "open"
+
+[[link_handlers]]
+id = "github-actions-run"
+title = "Open in GitHub Ops"
+pattern = "^https://github\\.com/[^/]+/[^/]+/actions/runs/[0-9]+([/?#].*)?$"
+action = "open"

@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Refresh the Venice catalog in Herdr Board before opening its TUI."""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import tomllib
+from pathlib import Path
+
+
+CONFIG_PATH = Path(
+    os.environ.get(
+        "HERDR_BOARD_CONFIG",
+        "~/.config/herdr-board/config.toml",
+    )
+).expanduser()
+OPENCODE_CONFIG_PATH = Path(
+    os.environ.get("OPENCODE_CONFIG", "~/.config/opencode/opencode.json")
+).expanduser()
+HARNESS_TABLE = "[harness.opencode-run]"
+
+
+def warn(message: str) -> None:
+    print(f"herdr-board-opencode-open: {message}", file=sys.stderr)
+
+
+def refresh_catalog() -> None:
+    sync_tool = shutil.which("venice-model-sync")
+    if not sync_tool:
+        raise RuntimeError("venice-model-sync is not available in PATH")
+    result = subprocess.run(
+        [sync_tool, "--quiet"], check=False, stdout=subprocess.DEVNULL
+    )
+    if result.returncode:
+        warn("venice-model-sync failed; using the current OpenCode config")
+
+    opencode = shutil.which("opencode")
+    if not opencode:
+        raise RuntimeError("opencode is not available in PATH")
+
+    result = subprocess.run(
+        [opencode, "models", "--refresh", "venice"],
+        check=False,
+        stdout=subprocess.DEVNULL,
+    )
+    if result.returncode:
+        warn("OpenCode model-cache refresh failed; using configured Venice models")
+
+
+def configured_models() -> list[str]:
+    with OPENCODE_CONFIG_PATH.open(encoding="utf-8") as config_file:
+        config = json.load(config_file)
+
+    models = config.get("provider", {}).get("venice", {}).get("models", {})
+    if not isinstance(models, dict) or not models:
+        raise RuntimeError(
+            f"no provider.venice.models entries in {OPENCODE_CONFIG_PATH}"
+        )
+    return [f"venice/{model_id}" for model_id in sorted(models)]
+
+
+def toml_string_array(values: list[str]) -> str:
+    # JSON string escaping is compatible with TOML basic strings.
+    encoded = json.dumps(values, ensure_ascii=False)
+    tomllib.loads(f"models = {encoded}\n")
+    return encoded
+
+
+def update_board_models(models: list[str]) -> bool:
+    original = CONFIG_PATH.read_text(encoding="utf-8")
+    parsed = tomllib.loads(original)
+    harness = parsed.get("harness", {}).get("opencode-run")
+    if not isinstance(harness, dict):
+        raise RuntimeError(f"missing {HARNESS_TABLE} in {CONFIG_PATH}")
+
+    updated_models = toml_string_array(models)
+    lines = original.splitlines(keepends=True)
+    table_start = next(
+        (index for index, line in enumerate(lines) if line.strip() == HARNESS_TABLE),
+        None,
+    )
+    if table_start is None:
+        raise RuntimeError(f"missing {HARNESS_TABLE} in {CONFIG_PATH}")
+
+    table_end = next(
+        (
+            index
+            for index in range(table_start + 1, len(lines))
+            if re.match(r"^\s*\[\[?[^\]]+\]\]?\s*(?:#.*)?$", lines[index])
+        ),
+        len(lines),
+    )
+
+    model_line = next(
+        (
+            index
+            for index in range(table_start + 1, table_end)
+            if re.match(r"^\s*models\s*=", lines[index])
+        ),
+        None,
+    )
+    if model_line is None:
+        newline = "\r\n" if any(line.endswith("\r\n") for line in lines) else "\n"
+        lines.insert(table_end, f"models = {updated_models}{newline}")
+    else:
+        ending = "\r\n" if lines[model_line].endswith("\r\n") else "\n"
+        current_line = lines[model_line].rstrip("\r\n")
+        prefix = re.match(r"^(\s*models\s*=\s*)", current_line).group(1)
+        comment = re.search(r"\s+#.*$", current_line)
+        suffix = f"  {comment.group(0).lstrip()}" if comment else ""
+        lines[model_line] = f"{prefix}{updated_models}{suffix}{ending}"
+
+    updated = "".join(lines)
+    # Validate the full file before replacing it, preserving every other setting.
+    tomllib.loads(updated)
+    if updated == original:
+        return False
+
+    mode = stat.S_IMODE(CONFIG_PATH.stat().st_mode)
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f".{CONFIG_PATH.name}.", suffix=".tmp", dir=CONFIG_PATH.parent
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as temporary_file:
+            temporary_file.write(updated)
+            temporary_file.flush()
+            os.fsync(temporary_file.fileno())
+        os.chmod(temporary_name, mode)
+        os.replace(temporary_name, CONFIG_PATH)
+    except BaseException:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        raise
+    return True
+
+
+def main() -> int:
+    sync_only = sys.argv[1:] == ["--sync-only"]
+    if sys.argv[1:] and not sync_only:
+        print(f"Usage: {Path(sys.argv[0]).name} [--sync-only]", file=sys.stderr)
+        return 64
+
+    try:
+        refresh_catalog()
+        models = configured_models()
+        changed = update_board_models(models)
+    except (OSError, json.JSONDecodeError, tomllib.TOMLDecodeError, RuntimeError) as error:
+        warn(str(error))
+        return 1
+
+    print(
+        f"herdr-board-opencode-open: {'updated' if changed else 'already current'}; "
+        f"{len(models)} Venice models"
+    )
+    if sync_only:
+        return 0
+
+    herdr = shutil.which("herdr")
+    if not herdr:
+        warn("herdr is not available in PATH")
+        return 127
+    return subprocess.run(
+        [herdr, "plugin", "action", "invoke", "open-board", "--plugin", "herdr-board"],
+        check=False,
+    ).returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

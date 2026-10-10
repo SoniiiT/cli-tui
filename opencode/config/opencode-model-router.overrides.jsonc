@@ -1,0 +1,22 @@
+{
+  "activePreset": "venice-private",
+  "presets": {
+    "venice-private": {
+      "fast": {
+        "model": "venice/z-ai-glm-5-3-flash",
+        "costRatio": 1,
+        "steps": 30
+      },
+      "medium": {
+        "model": "venice/deepseek-v4-flash-0731",
+        "costRatio": 0.67,
+        "steps": 50
+      },
+      "heavy": {
+        "model": "venice/deepseek-v4-pro-0813",
+        "costRatio": 10.4,
+        "steps": 120
+      }
+    }
+  }
+}

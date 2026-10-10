@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+model="${1:-}"
+if [[ -z "${BOARD_PROMPT:-}" ]]; then
+  printf '%s\n' "herdr-board-opencode-run: BOARD_PROMPT is empty" >&2
+  exit 64
+fi
+
+runtime_dir="${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}"
+prompt_file="$(mktemp "${runtime_dir%/}/herdr-board-opencode.XXXXXX.md")"
+chmod 600 "$prompt_file"
+cleanup() { rm -f -- "$prompt_file"; }
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+if command -v venice-model-sync >/dev/null 2>&1; then
+  venice-model-sync --quiet || true
+fi
+
+{
+  if [[ -n "${BOARD_SYSTEM_PROMPT:-}" ]]; then
+    printf '%s\n\n' "$BOARD_SYSTEM_PROMPT"
+  fi
+  printf '## Board task\n%s\n' "$BOARD_PROMPT"
+} > "$prompt_file"
+
+args=(run --file "$prompt_file")
+if [[ -n "$model" ]]; then
+  args+=(--model "$model")
+fi
+args+=("Read the attached Board instructions and task, follow them exactly, and report completion using the board CLI as instructed.")
+
+status=0
+opencode "${args[@]}" || status=$?
+exit "$status"
