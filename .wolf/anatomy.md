@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T13:55:30.849Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T19:45:09.831Z
 > Files: 20 tracked | Anatomy hits: 0 | Misses: 0
 
 > Project structure index. Auto-maintained by OpenWolf hooks and daemon.
@@ -11,7 +11,7 @@
 
 - `AGENTS.md` — OpenWolf (~200 tok)
 - `CLAUDE.md` — OpenWolf (~211 tok)
-- `README.md` — Project documentation (~716 tok)
+- `README.md` — Project documentation (~709 tok)
 
 ## docs/
 
@@ -52,10 +52,10 @@
 
 - `.gitignore` — Git ignore rules (~3 tok)
 - `Cargo.toml` — Rust package manifest (~91 tok)
-- `README.md` — Project documentation (~1243 tok)
-- `tool.toml` (~162 tok)
+- `README.md` — Project documentation (~1565 tok)
+- `tool.toml` (~344 tok)
 
 ## tools/alias-manager/src/
 
-- `lib.rs` — Alias: as_str, new, matches, changed + 14 more (~8627 tok)
-- `main.rs` — Declares Change (~10831 tok)
+- `lib.rs` — Alias: as_str, new, matches, changed (~10150 tok)
+- `main.rs` — Declares Change (~10145 tok)

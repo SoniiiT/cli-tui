@@ -31,6 +31,44 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-10-12"
+    },
+    {
+      "error_message": "Significant refactor of lib.rs",
+      "file": "tools/alias-manager/src/lib.rs",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 16→21 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-001",
+      "timestamp": "2026-10-12T19:01:35.276Z",
+      "last_seen": "2026-10-12T19:01:35.276Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "id": "alias-manager-macos-static-discovery-misses-system-aliases",
+      "timestamp": "2026-10-12",
+      "error_message": "On macOS, the alias-manager TUI shows no 'system' aliases, unlike the user's Linux machine where distro-shipped .bashrc aliases appear.",
+      "file": "tools/alias-manager/src/lib.rs",
+      "root_cause": "discover_aliases only text-scans the profile file and its literal source/. targets, and deliberately never executes that text. It therefore cannot see aliases a shell defines internally at interactive startup (confirmed via `zsh -f -i -c alias` still printing zsh's built-in `run-help=man` and `which-command=whence`, from no file at all) or anything set by conditional/plugin logic. The user's macOS ~/.zshrc genuinely has zero `alias` lines (only tool-managed blocks), so the static scanner correctly found nothing there; the Linux comparison only worked because that distro's .bashrc happens to contain literal alias text.",
+      "fix": "Added discover_live_aliases(shell), which runs `shell -i -c alias` in a timeout-bounded (5s), killed-on-timeout child process and parses its real alias output (parse_alias_dump_line, handles both bash's `alias name='value'` and zsh's `name=value` formats via the existing shell_words quoting parser). Merged over the static scan via merge_discovered_aliases (live wins on name conflicts) at the real CLI entry point in main.rs; discover_aliases itself is untouched so its existing hermetic tests still pass unmodified. Verified end-to-end on this Mac: native cargo test (17 passed, incl. two tests that spawn real bash/zsh with an isolated HOME and assert on real alias output), cargo clippy -D warnings clean, release build installed to /opt/homebrew/bin/alias-manager, and a real pty run (via `script`) entered the TUI's alternate screen and exited cleanly on SIGTERM with no panic. Also fixed a pre-existing clippy needless_return in default_config_dir's macOS/Windows cfg branches, uncovered because this was the first time clippy ran with the macOS cfg active.",
+      "tags": [
+        "alias-manager",
+        "macos",
+        "discovery",
+        "shell-integration"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-10-12"
     }
-  ]
+  ],
+  "applied_observations": {
+    "9b170aef-420a-48ec-aea5-41c5a63e95b2": true
+  },
+  "next_id": 3
 }

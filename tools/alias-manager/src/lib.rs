@@ -1,11 +1,14 @@
 use std::collections::{BTreeMap, HashSet};
 use std::env;
 use std::fs::{self, File, OpenOptions};
-use std::io::Write;
+use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::mpsc;
+use std::thread;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -14,6 +17,8 @@ const STORE_VERSION: u32 = 1;
 const START_MARKER: &[u8] = b"# >>> alias-manager >>>";
 const END_MARKER: &[u8] = b"# <<< alias-manager <<<";
 static TEMP_COUNTER: AtomicU64 = AtomicU64::new(0);
+const LIVE_SHELL_TIMEOUT: Duration = Duration::from_secs(5);
+const LIVE_SHELL_OUTPUT_CAP: u64 = 4 * 1024 * 1024;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "lowercase")]
@@ -116,7 +121,7 @@ pub fn default_shell() -> Shell {
 pub fn default_config_dir() -> Result<PathBuf> {
     #[cfg(target_os = "macos")]
     {
-        return Ok(home_dir()?.join("Library/Application Support/alias-manager"));
+        Ok(home_dir()?.join("Library/Application Support/alias-manager"))
     }
 
     #[cfg(target_os = "windows")]
@@ -124,7 +129,7 @@ pub fn default_config_dir() -> Result<PathBuf> {
         let appdata = env::var_os("APPDATA").map(PathBuf::from).ok_or_else(|| {
             anyhow!("APPDATA is not set; pass --config-dir with an explicit path")
         })?;
-        return Ok(appdata.join("alias-manager"));
+        Ok(appdata.join("alias-manager"))
     }
 
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
@@ -313,6 +318,115 @@ pub fn discover_aliases(shell: Shell, profile: &Path) -> Vec<DiscoveredAlias> {
     let mut visited = HashSet::new();
     scan_profile(shell, profile, &mut visited, &mut discovered);
     discovered.into_values().collect()
+}
+
+/// Ask the real `shell` binary which aliases exist once it has actually started up.
+///
+/// Static text scanning (`discover_aliases`) can only see aliases that are written
+/// literally in a profile file. It cannot see aliases a shell defines internally
+/// (e.g. zsh's built-in `run-help`/`which-command`), aliases set from conditional
+/// profile logic, or aliases pulled in by package-manager/plugin hooks that are not
+/// a plain `source path` line. This runs `shell -i -c alias` in a throwaway,
+/// timeout-bounded child process — mirroring exactly what happens when the user
+/// opens a new terminal — and parses its real `alias` output instead of guessing
+/// from source text. Nothing the shell does here can affect the calling process or
+/// its environment; the child and anything it starts is killed if it runs long.
+/// Returns an empty list (never panics or propagates an error) if the shell binary
+/// is missing or discovery fails, so a broken environment never blocks the TUI.
+pub fn discover_live_aliases(shell: Shell) -> Vec<DiscoveredAlias> {
+    let Ok(output) = dump_live_aliases(shell) else {
+        return Vec::new();
+    };
+    let source = PathBuf::from(format!("live {shell} shell"));
+    output
+        .lines()
+        .filter_map(|line| {
+            let (name, command) = parse_alias_dump_line(line)?;
+            let alias = Alias {
+                shell,
+                name,
+                command,
+            };
+            validate_alias(&alias).ok()?;
+            Some(DiscoveredAlias {
+                alias,
+                source: source.clone(),
+                line: 0,
+            })
+        })
+        .collect()
+}
+
+/// Merge a static text scan with a live-shell scan, letting the live result win on
+/// name conflicts since it reflects what the shell actually resolves to right now.
+pub fn merge_discovered_aliases(
+    static_discovered: Vec<DiscoveredAlias>,
+    live_discovered: Vec<DiscoveredAlias>,
+) -> Vec<DiscoveredAlias> {
+    let mut merged: BTreeMap<String, DiscoveredAlias> = static_discovered
+        .into_iter()
+        .map(|item| (item.alias.name.clone(), item))
+        .collect();
+    for item in live_discovered {
+        merged.insert(item.alias.name.clone(), item);
+    }
+    merged.into_values().collect()
+}
+
+fn dump_live_aliases(shell: Shell) -> Result<String> {
+    let mut command = Command::new(shell.as_str());
+    command
+        .args(["-i", "-c", "alias"])
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null());
+    run_with_timeout(command, LIVE_SHELL_TIMEOUT)
+}
+
+fn run_with_timeout(mut command: Command, timeout: Duration) -> Result<String> {
+    let mut child = command
+        .spawn()
+        .context("spawning shell for live alias discovery")?;
+    let stdout = child
+        .stdout
+        .take()
+        .context("capturing shell stdout for live alias discovery")?;
+    let (tx, rx) = mpsc::channel();
+    thread::spawn(move || {
+        let mut buffer = String::new();
+        let _ = stdout.take(LIVE_SHELL_OUTPUT_CAP).read_to_string(&mut buffer);
+        let _ = tx.send(buffer);
+    });
+    let start = std::time::Instant::now();
+    loop {
+        if child
+            .try_wait()
+            .context("waiting for live alias discovery shell")?
+            .is_some()
+        {
+            break;
+        }
+        if start.elapsed() > timeout {
+            let _ = child.kill();
+            let _ = child.wait();
+            bail!("live alias discovery timed out after {timeout:?}");
+        }
+        thread::sleep(Duration::from_millis(25));
+    }
+    rx.recv_timeout(timeout)
+        .context("reading live alias discovery output")
+}
+
+fn parse_alias_dump_line(line: &str) -> Option<(String, String)> {
+    let words = shell_words(line);
+    let candidate = match words.first().map(String::as_str) {
+        Some("alias") => words.get(1)?,
+        Some(_) => words.first()?,
+        None => return None,
+    };
+    let (name, command) = candidate.split_once('=')?;
+    validate_alias_name(name).ok()?;
+    Some((name.to_owned(), command.to_owned()))
 }
 
 fn scan_profile(
@@ -868,6 +982,99 @@ mod tests {
             item.alias.name == "say" && item.alias.command == "printf 'hello world'"
         }));
         assert!(!marker.exists());
+    }
+
+    #[test]
+    fn parses_bash_and_zsh_style_alias_dump_lines() {
+        assert_eq!(
+            parse_alias_dump_line("alias ll='ls -la'"),
+            Some(("ll".to_owned(), "ls -la".to_owned()))
+        );
+        assert_eq!(
+            parse_alias_dump_line("run-help=man"),
+            Some(("run-help".to_owned(), "man".to_owned()))
+        );
+        assert_eq!(
+            parse_alias_dump_line("say='echo hello world'"),
+            Some(("say".to_owned(), "echo hello world".to_owned()))
+        );
+        assert_eq!(parse_alias_dump_line(""), None);
+        assert_eq!(parse_alias_dump_line("not an alias line"), None);
+    }
+
+    #[test]
+    fn merges_live_aliases_over_static_ones_on_name_conflicts() {
+        let static_discovered = vec![
+            DiscoveredAlias {
+                alias: alias(Shell::Bash, "ll", "ls -la --stale"),
+                source: PathBuf::from(".bashrc"),
+                line: 3,
+            },
+            DiscoveredAlias {
+                alias: alias(Shell::Bash, "only-static", "echo static"),
+                source: PathBuf::from(".bashrc"),
+                line: 4,
+            },
+        ];
+        let live_discovered = vec![DiscoveredAlias {
+            alias: alias(Shell::Bash, "ll", "ls -la"),
+            source: PathBuf::from("live bash shell"),
+            line: 0,
+        }];
+        let merged = merge_discovered_aliases(static_discovered, live_discovered);
+        assert_eq!(merged.len(), 2);
+        let ll = merged.iter().find(|item| item.alias.name == "ll").unwrap();
+        assert_eq!(ll.alias.command, "ls -la");
+        assert_eq!(ll.source, PathBuf::from("live bash shell"));
+        assert!(merged.iter().any(|item| item.alias.name == "only-static"));
+    }
+
+    #[test]
+    fn live_discovery_parses_real_shell_alias_output_without_touching_real_profile() {
+        if Command::new("bash").arg("--version").output().is_err() {
+            return;
+        }
+        let home = tempfile::tempdir().unwrap();
+        fs::write(
+            home.path().join(".bashrc"),
+            "alias live-test='echo from live shell'\n",
+        )
+        .unwrap();
+        let mut command = Command::new("bash");
+        command
+            .args(["-i", "-c", "alias"])
+            .env("HOME", home.path())
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null());
+        let output = run_with_timeout(command, LIVE_SHELL_TIMEOUT).unwrap();
+        let (name, command) = output
+            .lines()
+            .find_map(parse_alias_dump_line)
+            .expect("expected at least one parsed alias from the live shell");
+        assert_eq!(name, "live-test");
+        assert_eq!(command, "echo from live shell");
+    }
+
+    #[test]
+    fn live_discovery_finds_zsh_built_in_aliases_no_profile_declares() {
+        if Command::new("zsh").arg("--version").output().is_err() {
+            return;
+        }
+        let home = tempfile::tempdir().unwrap();
+        let mut command = Command::new("zsh");
+        command
+            .args(["-i", "-c", "alias"])
+            .env("HOME", home.path())
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null());
+        let output = run_with_timeout(command, LIVE_SHELL_TIMEOUT).unwrap();
+        let parsed: Vec<_> = output.lines().filter_map(parse_alias_dump_line).collect();
+        assert!(
+            parsed.iter().any(|(name, command)| name == "run-help" && command == "man"),
+            "expected zsh's built-in run-help alias in live output: {output:?}"
+        );
     }
 
     #[test]

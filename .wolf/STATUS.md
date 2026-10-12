@@ -12,46 +12,33 @@ budget_tokens: 1000
 
 ## ✅ Done
 
-<!-- Move items here from "🚀 Next phase" when finished. Group by area. -->
-
-- Herdr pane structure: `herdr.auto-title` (kryptamine/herdr-auto-title v0.13.2) installed and started; auto-names tabs and panes. Pane boxes enabled natively in `~/.config/herdr/config.toml` (`pane_gaps = true`, `pane_outer_borders = true`, `pane_borders = "always"`); config checked and reloaded. Agents list titles fixed via OpenCode plugin `justmytwospence/opencode-herdr` (pinned f1c0f2b67453) in `opencode.json` + `tui.jsonc`. Root cause for missing titles: Venice rejected title-agent requests for `small_model` z-ai-glm-5-3-flash (Bad Request); switched to `venice/deepseek-v4-flash`, verified end-to-end (new session → generated title → radar row shows `OC | <title>`). Idle OpenCode panes w11/w1A restarted via SIGTERM + `herdr pane run … "opencode --continue"`; the cli-tui pane (wX) still runs the old TUI and needs a user restart. Titles generate only for NEW sessions. Setup split into harness-specific guides: `herdr/docs/setup-claude-code.md` and `herdr/docs/setup-opencode.md`, linked from `herdr/README.md`; both end with a paste-able agent prompt, and `CLAUDE.md`/`AGENTS.md` route each harness to its guide. Learnings in cerebrum, bug in buglog.
-- Alias Manager implemented and installed at `~/.cargo/bin/alias-manager`; Bash/Zsh TUI supports discovery of static profile aliases, CRUD, search, preview/confirm, safe storage, and automatic reload through the profile wrapper.
-- OpenWolf v2.5.2 initialized for OpenCode in this repository; daemon reports running.
-- Repository documentation is in English. Linux Bash core path is supported based on Omarchy 4.0.4/Linux 7.2.5-3-omarchy x86_64 testing; macOS is unverified; Windows is unsupported.
+- **Alias Manager — live alias discovery added, macOS "missing system aliases" root-caused and fixed, macOS now `supported`.** Static scan only reads profile text, so it could never see shell-internal aliases (e.g. zsh's built-in `run-help`) or the user's genuinely-empty `~/.zshrc`. Added `discover_live_aliases` (runs `shell -i -c alias`, 5s timeout) + `merge_discovered_aliases` (live wins) in `tools/alias-manager/src/lib.rs` / `main.rs`; static `discover_aliases` untouched, old tests still pass. Fixed a pre-existing clippy `needless_return` in `default_config_dir`'s macOS branch. User independently confirmed discovery against their real `~/.zshrc`; additionally verified full interactive core path (discover/search/create/delete) via scripted pty (`expect`) input checked against the on-disk `aliases.json`/`zsh-aliases.sh`, not just screen output. macOS flipped `unverified` → `supported` in `tool.toml` + both READMEs (root catalog + tool README). Full detail: `.wolf/buglog.json` → `alias-manager-macos-static-discovery-misses-system-aliases`, `.wolf/cerebrum.md`. Release binary rebuilt and reinstalled to `/opt/homebrew/bin/alias-manager`.
+- Alias Manager core (prior session): Bash/Zsh TUI, CRUD, search, preview/confirm, safe storage, profile-managed reload function.
+- Herdr pane titles/boxes + OpenCode agent-list titles fixed, documented per-harness in `herdr/docs/setup-*.md`.
+- Linux Bash core path `supported` (Omarchy 4.0.4); Windows `unsupported`.
 
 ---
 
-## 🚀 Next phase
+## 🚀 Next quest
 
-**Goal:** Await the next user request; no implementation task is currently active.
-
-### Acceptance criteria
-1. Confirm scope for the next requested change.
-
-### Files to create / edit
-| Type | File | Content |
-|---|---|---|
-| — | — | No files selected yet. |
-
-### Closed decisions
-- Alias activation uses a profile-managed shell function because a child process cannot mutate its parent shell; an already-open shell needs a one-time profile reload.
+**Goal:** None active — await the next user request.
 
 ### Open decisions
-- macOS native verification remains outstanding if macOS support is requested.
+- None currently — macOS platform status resolved this session (see Done).
 
 ---
 
 ## 📁 Active architecture
 
 - **Stack:** Rust, Ratatui, Crossterm; standalone tool projects.
-- **Key modules:** `tools/alias-manager/src/lib.rs` (storage, shell adapters, profile integration), `src/main.rs` (TUI and state flow).
-- **Patterns:** Platform support is recorded per tool; statuses must match the root catalog and have native evidence.
+- **Key modules:** `tools/alias-manager/src/lib.rs` (storage, shell adapters, static + live discovery, profile integration), `tools/alias-manager/src/main.rs` (TUI, state flow, wires `discover_aliases` + `discover_live_aliases` via `merge_discovered_aliases`).
+- **Patterns:** Platform support recorded per tool in `tool.toml`, must match root README catalog and carry native evidence (see `docs/platform-support.md`); do not mark a platform `supported` without real native proof of the core interactive path.
 
 ---
 
 ## ⚠️ External blockers (don't block coding)
 
-- macOS native test is not available in this session; status remains `unverified`.
+- None currently tracked.
 
 ---
 
@@ -60,6 +47,7 @@ budget_tokens: 1000
 ```bash
 cargo test --manifest-path tools/alias-manager/Cargo.toml
 cargo clippy --manifest-path tools/alias-manager/Cargo.toml --all-targets -- -D warnings
+cargo build --release --manifest-path tools/alias-manager/Cargo.toml  # then cp target/release/alias-manager /opt/homebrew/bin/
 openwolf status
 ```
 

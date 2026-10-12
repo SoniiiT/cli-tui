@@ -19,8 +19,8 @@ use ratatui::{Frame, Terminal};
 
 use alias_manager::{
     apply_profile_update, default_config_dir, default_profile, default_shell, discover_aliases,
-    load_alias_state, persist_alias_state, prepare_profile_update, validate_alias, Alias, AliasKey,
-    DiscoveredAlias, Shell,
+    discover_live_aliases, load_alias_state, merge_discovered_aliases, persist_alias_state,
+    prepare_profile_update, validate_alias, Alias, AliasKey, DiscoveredAlias, Shell,
 };
 
 struct Options {
@@ -528,7 +528,10 @@ fn main() -> Result<()> {
     }
 
     persist_alias_state(&options.config_dir, &aliases, &suppressed)?;
-    let discovered = discover_aliases(options.shell, &profile);
+    let discovered = merge_discovered_aliases(
+        discover_aliases(options.shell, &profile),
+        discover_live_aliases(options.shell),
+    );
     run_tui(
         options.shell,
         options.config_dir,

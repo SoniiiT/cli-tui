@@ -1,6 +1,6 @@
 # Alias Manager
 
-Alias Manager is a standalone fullscreen TUI for discovering and managing Bash and Zsh aliases from shell profiles. Alias names and commands are configurable. Changes are saved only after a before/after preview and explicit confirmation. The application never runs alias commands or shell profiles.
+Alias Manager is a standalone fullscreen TUI for discovering and managing Bash and Zsh aliases from shell profiles. Alias names and commands are configurable. Changes are saved only after a before/after preview and explicit confirmation. The application never runs a managed alias's own command. On startup it combines two discovery passes: a static text scan of the profile (and anything it `source`s) that never executes that text, and a live scan that briefly starts the real target shell in a throwaway, timeout-bounded process to ask it what aliases actually exist — which is the only way to see aliases a shell defines internally (e.g. zsh's built-in `run-help`) or that only appear once the shell has actually initialized.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ alias-manager --setup [--shell bash|zsh] [--config-dir PATH] [--profile PATH]
 alias-manager --help
 ```
 
-`--config-dir` and `--profile` are useful for tests and custom shell profiles. By default, Linux uses `~/.bashrc` or `~/.zshrc`; macOS uses `~/.bash_profile` or `~/.zshrc`. On TUI startup, the manager reads alias declarations from the selected profile and statically referenced `source`/`.` files.
+`--config-dir` and `--profile` are useful for tests and custom shell profiles. By default, Linux uses `~/.bashrc` or `~/.zshrc`; macOS uses `~/.bash_profile` or `~/.zshrc`. On TUI startup, the manager reads alias declarations from the selected profile and statically referenced `source`/`.` files, then separately launches the selected shell (`bash`/`zsh` on `PATH`, always its real startup — independent of `--profile`) to capture the aliases it reports once genuinely running. Where both passes see the same name, the live result wins.
 
 ## Usage
 
@@ -57,7 +57,8 @@ To enable integration, run `alias-manager --setup`, review the profile change, a
 - Newly created config and shell files use Unix mode `0600`; updates preserve existing permissions.
 - Duplicate names within the same shell are rejected. Bash and Zsh may each have an alias with the same name.
 - Alias names may contain ASCII letters, digits, `_`, `.`, `-`, and `+`; commands must not be empty.
-- Profiles are read as text and never executed. Discovery supports simple static `alias name=value` declarations and static `source`/`.` paths. Dynamically generated aliases and conditional profile behavior are not evaluated; for repeated names, the last declaration read wins. Global aliases in unreferenced system files and shell functions are outside the MVP.
+- Static discovery reads profiles as text and never executes them: it supports simple `alias name=value` declarations and static `source`/`.` paths, with the last declaration read winning for repeated names. Conditional profile logic is not evaluated by this pass.
+- Live discovery additionally starts the real shell (`bash -i -c alias` / `zsh -i -c alias`) in a killed-on-timeout child process and parses its actual `alias` output, so it also finds shell built-ins, conditionally defined aliases, and anything loaded by plugins or package-manager hooks that isn't a plain `source` line. Nothing that profile runs can affect the calling process; a hung shell is killed after 5 seconds and discovery continues with whatever was already found. Shell functions and zsh suffix aliases (`alias -s`) are outside the MVP.
 - Profile integration is performed only through `--setup`. Bytes outside the managed section are preserved; the backup is stored next to the profile with the suffix `.alias-manager.bak-<timestamp>`.
 
 ## Failure cases and limitations
@@ -65,7 +66,7 @@ To enable integration, run `alias-manager --setup`, review the profile change, a
 - The MVP implements Bash and Zsh. Windows/PowerShell and other shells are unsupported.
 - Profile changes require interactive confirmation. Symlink profiles and profiles with damaged or duplicate markers are rejected.
 - On permission or write errors, the TUI keeps the preview state and displays an error message.
-- The Bash core path was installed and tested on Linux. macOS has not been tested natively and remains `unverified`; having macOS-specific paths implemented is not sufficient evidence of support.
+- The Bash core path was installed and tested on Linux; the Zsh core path (incl. live discovery) was installed and tested natively on macOS.
 
 ## Tests
 
@@ -79,7 +80,7 @@ cargo fmt -- --check
 | Platform | Status | Evidence |
 | --- | --- | --- |
 | Linux | `supported` (Bash core path) | Omarchy 4.0.4, Linux 7.2.5-3-omarchy x86_64, tested 2026-10-08. `cargo test` (13 tests), Clippy, release build, and `cargo install` succeeded; profile integration and alias activation were verified. |
-| macOS | `unverified` | Bash/Zsh profile paths are implemented, but no native build and core-path test has been run. |
+| macOS | `supported` (Zsh core path) | macOS 27.0.0 (Darwin) arm64, tested 2026-10-12. `cargo test` (17 tests, incl. real bash/zsh live-discovery), Clippy, release build native; scripted pty input exercised discovery, search, create, and delete against the on-disk store; end user confirmed discovery against their own real `~/.zshrc`. |
 | Windows | `unsupported` | PowerShell and Windows shell integration are not implemented. |
 
 Platform status requirements are in [`../../docs/platform-support.md`](../../docs/platform-support.md).

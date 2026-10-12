@@ -45,3 +45,28 @@ description: chronological action log per session, consolidated weekly
 | 15:50 | agent-routing: CLAUDE.md/AGENTS.md zeigen harness-spezifisch auf setup-guide; paste-able agent-prompts in beiden guides | CLAUDE.md, AGENTS.md, herdr/docs/setup-*.md, herdr/README.md | done | ~15k |
 | 15:55 | Edited herdr/README.md | — | ~112 |
 | 15:57 | Session end: 13 writes across 5 files (README.md, setup-claude-code.md, setup-opencode.md, AGENTS.md, CLAUDE.md) | 0 reads | ~5365 tok |
+
+## Session: 2026-10-12 20:53
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:01 | Edited tools/alias-manager/src/lib.rs | 16→21 lines | ~198 |
+| 21:01 | Edited tools/alias-manager/src/lib.rs | modified discover_aliases() | ~1204 |
+| 21:02 | Edited tools/alias-manager/src/main.rs | 5→5 lines | ~79 |
+| 21:02 | Edited tools/alias-manager/src/main.rs | 3→6 lines | ~63 |
+| 21:03 | Edited tools/alias-manager/src/lib.rs | modified parses_bash_and_zsh_style_alias_dump_lines() | ~765 |
+| 21:03 | Edited tools/alias-manager/src/lib.rs | 12→12 lines | ~102 |
+| 21:04 | Edited tools/alias-manager/src/lib.rs | modified live_discovery_finds_zsh_built_in_aliases_no_profile_declares() | ~277 |
+| 21:09 | Edited tools/alias-manager/README.md | inline fix | ~195 |
+| 21:09 | Edited tools/alias-manager/README.md | inline fix | ~144 |
+| 21:09 | Edited tools/alias-manager/README.md | 1→2 lines | ~218 |
+| 21:09 | Edited tools/alias-manager/tool.toml | 3→3 lines | ~127 |
+
+## Session: 2026-10-12 21:44
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:44 | Edited tools/alias-manager/tool.toml | 3→3 lines | ~207 |
+| 21:44 | Edited README.md | 3→3 lines | ~89 |
+| 21:45 | Edited tools/alias-manager/README.md | inline fix | ~38 |
+| 21:45 | Edited tools/alias-manager/README.md | "unverified" → "supported" | ~91 |

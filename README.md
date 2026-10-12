@@ -6,9 +6,9 @@ A collection of standalone CLI and TUI applications for Windows, Linux, and macO
 
 | Tool | Purpose | Windows | Linux | macOS |
 | --- | --- | --- | --- | --- |
-| [Alias Manager](tools/alias-manager/README.md) | Discover and manage Bash/Zsh aliases from shell profiles | Unsupported | Supported | Unverified |
+| [Alias Manager](tools/alias-manager/README.md) | Discover and manage Bash/Zsh aliases from shell profiles | Unsupported | Supported | Supported |
 
-Platform statuses and evidence requirements are defined in [`docs/platform-support.md`](docs/platform-support.md). Linux is supported for the tested Bash core path; macOS remains unverified until tested natively.
+Platform statuses and evidence requirements are defined in [`docs/platform-support.md`](docs/platform-support.md). Linux and macOS are both supported for the tested Bash/Zsh core path.
 
 ## Repository conventions
 

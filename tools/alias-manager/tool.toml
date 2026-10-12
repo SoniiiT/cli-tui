@@ -13,5 +13,5 @@ status = "supported"
 evidence = "Omarchy 4.0.4, Linux 7.2.5-3-omarchy x86_64, 2026-10-08: cargo test (13 passed), cargo clippy, cargo build --release, cargo install; Bash profile setup and alias activation verified."
 
 [platforms.macos]
-status = "unverified"
-evidence = ""
+status = "supported"
+evidence = "macOS 27.0.0 (Darwin) arm64, 2026-10-12: cargo test (17 passed, incl. two tests spawning real bash/zsh to confirm live alias discovery), cargo clippy -D warnings, cargo build --release all passed natively. Full core path exercised via scripted pty input (expect) against the release binary: static+live discovery (confirmed zsh's built-in run-help/which-command plus a profile alias), search filter, create with two-stage validate/preview/confirm, and delete, each verified against the on-disk aliases.json/zsh-aliases.sh, not just screen output; clean alternate-screen enter/exit and no orphaned process on quit. Discovery result additionally confirmed by the end user against their own real ~/.zshrc and installed binary."
