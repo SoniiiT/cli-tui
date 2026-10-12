@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-08T01:26:06.959Z
-> Files: 17 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T13:55:30.849Z
+> Files: 20 tracked | Anatomy hits: 0 | Misses: 0
 
 > Project structure index. Auto-maintained by OpenWolf hooks and daemon.
 > Run `openwolf scan` to generate, or wait for the first Claude Code session.
@@ -9,8 +9,8 @@
 
 ## ./
 
-- `AGENTS.md` — OpenWolf (~75 tok)
-- `CLAUDE.md` — OpenWolf (~99 tok)
+- `AGENTS.md` — OpenWolf (~200 tok)
+- `CLAUDE.md` — OpenWolf (~211 tok)
 - `README.md` — Project documentation (~716 tok)
 
 ## docs/
@@ -21,6 +21,15 @@
 
 - `alias-manager-tui.md` — Implementation plan: Alias Manager TUI (~2131 tok)
 - `cli-tui-sammlung.md` — Implementation plan: CLI/TUI collection for Windows, Linux, and macOS (~1562 tok)
+
+## herdr/
+
+- `README.md` — Project documentation (~4862 tok)
+
+## herdr/docs/
+
+- `setup-claude-code.md` — Herdr-Setup: Claude Code Harness (~1242 tok)
+- `setup-opencode.md` — Herdr-Setup: OpenCode Harness (~1563 tok)
 
 ## tools/
 

@@ -6,7 +6,7 @@ budget_tokens: 1000
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
 > Update this file at the end of every work phase so the next `/clear` resumes in 1 read.
-> Last updated: 2026-10-08
+> Last updated: 2026-10-12
 
 ---
 
@@ -14,6 +14,7 @@ budget_tokens: 1000
 
 <!-- Move items here from "🚀 Next phase" when finished. Group by area. -->
 
+- Herdr pane structure: `herdr.auto-title` (kryptamine/herdr-auto-title v0.13.2) installed and started; auto-names tabs and panes. Pane boxes enabled natively in `~/.config/herdr/config.toml` (`pane_gaps = true`, `pane_outer_borders = true`, `pane_borders = "always"`); config checked and reloaded. Agents list titles fixed via OpenCode plugin `justmytwospence/opencode-herdr` (pinned f1c0f2b67453) in `opencode.json` + `tui.jsonc`. Root cause for missing titles: Venice rejected title-agent requests for `small_model` z-ai-glm-5-3-flash (Bad Request); switched to `venice/deepseek-v4-flash`, verified end-to-end (new session → generated title → radar row shows `OC | <title>`). Idle OpenCode panes w11/w1A restarted via SIGTERM + `herdr pane run … "opencode --continue"`; the cli-tui pane (wX) still runs the old TUI and needs a user restart. Titles generate only for NEW sessions. Setup split into harness-specific guides: `herdr/docs/setup-claude-code.md` and `herdr/docs/setup-opencode.md`, linked from `herdr/README.md`; both end with a paste-able agent prompt, and `CLAUDE.md`/`AGENTS.md` route each harness to its guide. Learnings in cerebrum, bug in buglog.
 - Alias Manager implemented and installed at `~/.cargo/bin/alias-manager`; Bash/Zsh TUI supports discovery of static profile aliases, CRUD, search, preview/confirm, safe storage, and automatic reload through the profile wrapper.
 - OpenWolf v2.5.2 initialized for OpenCode in this repository; daemon reports running.
 - Repository documentation is in English. Linux Bash core path is supported based on Omarchy 4.0.4/Linux 7.2.5-3-omarchy x86_64 testing; macOS is unverified; Windows is unsupported.

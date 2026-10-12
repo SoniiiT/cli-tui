@@ -23,6 +23,7 @@ auf beiden Betriebssystemen getestet; einzelne Linux-only-Workarounds sind expli
 | Terminal Browser (`zenbu-labs.terminal-browser`) | Echter Chromium-Browser im Terminal, als Split neben dem fokussierten Pane. |
 | Terminal Code (`zenbu-labs.tode`) | VS Code im Terminal, ersetzt die Shell im fokussierten Pane ohne zusätzlichen Split. |
 | Zoetrope (`furkankly.zoetrope`) | Sitzungsgraph einer Claude-Code- oder Codex-Session als Overlay/Split/Tab. OpenCode wird nicht unterstützt. |
+| Herdr Auto Title (`herdr.auto-title`) | Benennt Tabs und Panes automatisch nach Projekt, Git-Branch, Programm und Agent-Aufgabe. Manuell vergebene Namen bleiben erhalten. |
 
 Firstmate und Captain’s Deck gehören **nicht** zu diesem Setup. Captain’s Deck ist ein Firstmate-Board
 und für ein persönliches Ideenboard nicht erforderlich.
@@ -76,7 +77,13 @@ herdr plugin install drewbitt/herdr-jiratui
 herdr plugin install zenbu-labs/terminal-browser/herdr-plugin
 herdr plugin install zenbu-labs/terminal-code/herdr-plugin
 herdr plugin install furkankly/zoetrope/herdr-plugin
+herdr plugin install kryptamine/herdr-auto-title
 ```
+
+Auto Title benötigt nach der Installation einmalig einen Start, weil Herdr Plugins nur beim
+Server-Start lädt: `herdr plugin action invoke herdr.auto-title.restart`. Herdr baut das Plugin
+aus Go-Quellen (Go 1.24+). Achtung: Der erste Start benennt alle bestehenden Panes einmal um,
+danach nur noch unbenannte.
 
 Bei einer interaktiven Installation das Build-Preview prüfen. Die Board-Version ist absichtlich auf
 `v0.19.0` festgelegt. Der GitHub-Installer baut das Rust-Plugin und legt das `board`-CLI unter
@@ -278,6 +285,24 @@ Detaillierte Bedienung, Fehlerbilder und Beispielaufrufe für alle fünf stehen 
   Herdr-Integration für den jeweiligen Agenten (`herdr integration status`). Keybinding per
   `herdr plugin action invoke setup-keys --plugin furkankly.zoetrope` einrichten lassen, statt es von
   Hand in `config.toml` zu schreiben — das sichert die Konfiguration vorher und prüft freie Tasten.
+
+## Pane-Rahmen und Agents-Liste (Harness-Guides)
+
+Pane-Boxen, automatische Titel und eine lesbare Agents-Liste sind Harness-spezifisch in zwei
+Guides dokumentiert – beide decken Radars Sidebar-Block, die Border-Einstellungen in
+`~/.config/herdr/config.toml` und die Verifikation ab:
+
+- **[docs/setup-claude-code.md](docs/setup-claude-code.md)** – Claude Code: Titel kommen nativ
+  aus dem Terminal-Titel; volle auto-title-Transkript-Features inkl. optionaler `$topic`-Zeile.
+- **[docs/setup-opencode.md](docs/setup-opencode.md)** – OpenCode: braucht zusätzlich das
+  Plugin `opencode-herdr` (Session-Titel an Herdr) und ein funktionierendes `small_model` für
+  die Titel-Generierung; enthält den Venice-`Bad-Request`-Fall und das Fern-Neustarten von TUIs.
+
+Beide Guides nicht mischen: Integration, Plugins und Config-Schritte unterscheiden sich je
+Harness. Dieser Rechner folgt dem OpenCode-Guide. Jeder Guide endet mit einem einfügebereiten
+**Agent-Prompt**, mit dem der jeweilige Agent (Claude Code bzw. OpenCode) das Setup selbst
+ausführt; zusätzlich verweisen die Repo-Dateien `CLAUDE.md` (Claude Code) und `AGENTS.md`
+(OpenCode) harness-spezifisch auf den passenden Guide.
 
 ## Tastenkürzel
 

@@ -1,32 +1,32 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-10-08T01:26:06.959Z",
-    "fileCount": 17,
+    "lastScanned": "2026-10-12T13:55:30.849Z",
+    "fileCount": 20,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "052efc469f1f7752a4870108c38a338b6fe31dcb420f0fb51c59616e2c9802eb",
-    "storeUpdatedAt": "2026-10-08T01:26:06.960Z",
+    "renderedHash": "b3956ed9dea2fb9af2723e88b3d344f1ffa99d79e950f11c9636e6e8c7f0c387",
+    "storeUpdatedAt": "2026-10-12T13:55:30.849Z",
     "rootHash": "9a91d43e622ac248"
   },
   "files": {
     "AGENTS.md": {
       "description": "OpenWolf",
-      "tokens": 75,
-      "hash": "e401f79554a8d796",
-      "size": 297,
-      "mtimeMs": 1791422720937.934,
-      "updatedAt": "2026-10-08T01:26:06.853Z",
-      "source": "scan"
+      "tokens": 200,
+      "hash": "8158ff77882b1cac",
+      "size": 799,
+      "mtimeMs": 1791813185067.8335,
+      "updatedAt": "2026-10-12T13:53:05.075Z",
+      "source": "hook"
     },
     "CLAUDE.md": {
       "description": "OpenWolf",
-      "tokens": 99,
-      "hash": "074d6b42b583729a",
-      "size": 395,
-      "mtimeMs": 1791422715256.8325,
-      "updatedAt": "2026-10-08T01:26:06.854Z",
-      "source": "scan"
+      "tokens": 211,
+      "hash": "b4f941e2f1a40eb1",
+      "size": 844,
+      "mtimeMs": 1791813185068.8335,
+      "updatedAt": "2026-10-12T13:53:05.088Z",
+      "source": "hook"
     },
     "docs/plans/alias-manager-tui.md": {
       "description": "Implementation plan: Alias Manager TUI",
@@ -590,6 +590,33 @@
       "mtimeMs": 1791422313184.6704,
       "updatedAt": "2026-10-08T01:26:06.866Z",
       "source": "scan"
+    },
+    "herdr/README.md": {
+      "description": "Project documentation",
+      "tokens": 4862,
+      "hash": "57ad70fa57d19563",
+      "size": 19644,
+      "mtimeMs": 1791813330836.961,
+      "updatedAt": "2026-10-12T13:55:30.849Z",
+      "source": "hook"
+    },
+    "herdr/docs/setup-claude-code.md": {
+      "description": "Herdr-Setup: Claude Code Harness",
+      "tokens": 1242,
+      "hash": "a5300b0d90c3f0a0",
+      "size": 5013,
+      "mtimeMs": 1791813305447.5845,
+      "updatedAt": "2026-10-12T13:55:05.458Z",
+      "source": "hook"
+    },
+    "herdr/docs/setup-opencode.md": {
+      "description": "Herdr-Setup: OpenCode Harness",
+      "tokens": 1563,
+      "hash": "ebcac5404e308ad6",
+      "size": 6302,
+      "mtimeMs": 1791813305448.5845,
+      "updatedAt": "2026-10-12T13:55:05.473Z",
+      "source": "hook"
     }
   },
   "preamble": [

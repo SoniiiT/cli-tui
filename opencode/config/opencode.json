@@ -2,7 +2,8 @@
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
     "opencode-notify",
-    "opencode-model-router@2.5.0"
+    "opencode-model-router@2.5.0",
+    "opencode-herdr@github:justmytwospence/opencode-herdr#f1c0f2b67453"
   ],
   "autoupdate": false,
   "compaction": {
@@ -2651,6 +2652,36 @@
             }
           }
         },
+        "openai-gpt-61-sol-ultrafast": {
+          "name": "GPT-6.1 Sol Ultrafast",
+          "reasoning": true,
+          "tool_call": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 880000,
+            "output": 128000
+          },
+          "cost": {
+            "input": 15,
+            "output": 75,
+            "cache_read": 0.75,
+            "cache_write": 18.75,
+            "context_over_200k": {
+              "input": 30,
+              "output": 112.5,
+              "cache_read": 1.5,
+              "cache_write": 37.5
+            }
+          }
+        },
         "openai-gpt-4o-2024-11-20": {
           "name": "GPT-4o",
           "reasoning": false,
@@ -3125,5 +3156,5 @@
     ]
   },
   "model": "venice/kimi-k2-7-code",
-  "small_model": "venice/z-ai-glm-5-3-flash"
+  "small_model": "venice/deepseek-v4-flash"
 }

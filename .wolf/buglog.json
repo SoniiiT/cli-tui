@@ -8,9 +8,29 @@
       "file": "tools/alias-manager/src/lib.rs",
       "root_cause": "The TUI runs as a child process and cannot mutate the parent shell; the existing shell had not loaded the new profile wrapper.",
       "fix": "Install a profile-managed alias-manager function that sources the generated alias file after successful exit; reload the profile once in already-running shells.",
-      "tags": ["alias-manager", "shell-integration"],
+      "tags": [
+        "alias-manager",
+        "shell-integration"
+      ],
       "occurrences": 1,
       "last_seen": "2026-10-08"
+    },
+    {
+      "id": "opencode-title-agent-venice-bad-request",
+      "timestamp": "2026-10-12",
+      "error_message": "OpenCode sessions keep 'New session - …' placeholder titles; log shows agent=title stream error: AI_APICallError: Bad Request (providerID=venice, modelID=z-ai-glm-5-3-flash).",
+      "file": "~/.config/opencode/opencode.json",
+      "root_cause": "Venice rejects the title agent's request shape for z-ai-glm-5-3-flash (the small_model); the model works fine for main-agent calls, only the title-agent request fails.",
+      "fix": "Set small_model to venice/deepseek-v4-flash in opencode.json. Verified: new sessions get generated titles. Existing placeholder sessions are never re-titled (title gen runs only on a new session's first exchange).",
+      "tags": [
+        "opencode",
+        "venice",
+        "small_model",
+        "title-generation",
+        "herdr"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-10-12"
     }
   ]
 }
