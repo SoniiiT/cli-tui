@@ -70,3 +70,58 @@ description: chronological action log per session, consolidated weekly
 | 21:44 | Edited README.md | 3→3 lines | ~89 |
 | 21:45 | Edited tools/alias-manager/README.md | inline fix | ~38 |
 | 21:45 | Edited tools/alias-manager/README.md | "unverified" → "supported" | ~91 |
+| 21:47 | Session end: 15 writes across 4 files (lib.rs, main.rs, README.md, tool.toml) | 2 reads | ~4772 tok |
+
+## Session: 2026-10-12 21:48
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 21:59 | Created tools/venv-runner/Cargo.toml | — | ~99 |
+| 21:59 | Created tools/venv-runner/.gitignore | — | ~3 |
+| 21:59 | Created tools/venv-runner/src/lib.rs | — | ~69 |
+| 21:59 | Created tools/venv-runner/src/project.rs | — | ~3770 |
+| 22:00 | Created tools/venv-runner/src/python.rs | — | ~3351 |
+| 22:00 | Created tools/venv-runner/src/plan.rs | — | ~3397 |
+| 22:01 | Created tools/venv-runner/src/app.rs | — | ~7071 |
+| 22:02 | Created tools/venv-runner/src/ui.rs | — | ~3889 |
+| 22:02 | Created tools/venv-runner/src/main.rs | — | ~2268 |
+| 22:02 | Edited tools/venv-runner/src/app.rs | 2→2 lines | ~29 |
+| 22:08 | Edited tools/venv-runner/src/main.rs | modified take() | ~253 |
+| 22:10 | Edited tools/venv-runner/src/python.rs | modified is_command() | ~107 |
+| 22:10 | Edited tools/venv-runner/src/python.rs | 10→6 lines | ~73 |
+| 22:10 | Edited tools/venv-runner/src/python.rs | modified only_the_bare_command_counts_as_the_default_python() | ~164 |
+| 22:10 | Edited tools/venv-runner/src/python.rs | expanded (+12 lines) | ~184 |
+| 22:13 | Created tools/venv-runner/tool.toml | — | ~364 |
+| 22:13 | Created tools/venv-runner/README.md | — | ~1622 |
+| 22:13 | Edited README.md | 3→4 lines | ~146 |
+<!-- session:M2VjNGM2Y2ItMWNkMi00NDc3LWFiODgtZTJjODQ5ZWMyNDYw -->
+| 2026-10-12T20:17:06.812Z | Built tools/venv-runner (Rust/Ratatui): finds/creates Python venvs and runs the project in the real terminal. Fixed default-interpreter bug (Path::file_stem) and idle redraw loop found via pty testing. Docs/tool.toml/root catalog added; macOS supported, Linux/Windows unverified. Release binary installed to /opt/homebrew/bin/venv-runner at user request; not committed (user will test first). | tools/venv-runner/**,README.md,.wolf/cerebrum.md,.wolf/buglog.json,.wolf/STATUS.md | 53 unit tests + clippy + fmt pass; 74 pty checks pass on release binary; installed binary byte-identical to fresh build |
+| 22:20 | Edited tools/venv-runner/src/project.rs | modified dir_stats() | ~677 |
+| 22:20 | Edited tools/venv-runner/src/project.rs | inline fix | ~12 |
+| 22:20 | Edited tools/venv-runner/src/project.rs | modified deleting_a_venv_removes_it_and_nothing_else_in_the_project() | ~1377 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | 4→5 lines | ~69 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | expanded (+13 lines) | ~131 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | expanded (+9 lines) | ~183 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | 2→3 lines | ~60 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | modified open_create() | ~382 |
+| 22:21 | Edited tools/venv-runner/src/app.rs | modified confirm() | ~1525 |
+| 22:22 | Edited tools/venv-runner/src/ui.rs | modified draw_venv_list() | ~47 |
+| 22:22 | Edited tools/venv-runner/src/ui.rs | 2→3 lines | ~62 |
+| 22:22 | Edited tools/venv-runner/src/ui.rs | modified draw_confirm_delete() | ~914 |
+| 22:22 | Edited tools/venv-runner/src/ui.rs | inline fix | ~20 |
+| 22:22 | Edited tools/venv-runner/src/ui.rs | modified press_d() | ~659 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | modified draw_confirm_delete() | ~23 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | 3→4 lines | ~35 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | modified draw_create() | ~23 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | 4→5 lines | ~38 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | modified draw_edit_run() | ~23 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | 4→5 lines | ~42 |
+| 22:23 | Edited tools/venv-runner/src/ui.rs | modified modal_rect() | ~282 |
+| 22:24 | Edited tools/venv-runner/src/ui.rs | modified render() | ~110 |
+| 22:24 | Edited tools/venv-runner/src/ui.rs | modified venv_in_a_deeply_nested_project() | ~1162 |
+| 22:24 | Edited tools/venv-runner/src/ui.rs | 13→11 lines | ~116 |
+| 22:26 | Edited tools/venv-runner/README.md | expanded (+7 lines) | ~255 |
+| 22:26 | Edited tools/venv-runner/README.md | 2→2 lines | ~24 |
+| 22:26 | Edited tools/venv-runner/README.md | inline fix | ~67 |
+<!-- session:M2VjNGM2Y2ItMWNkMi00NDc3LWFiODgtZTJjODQ5ZWMyNDYw -->
+| 2026-10-12T20:27:12.019Z | Added delete to venv-runner: d/Delete opens a confirmation dialog (folder, version, files+size), only y deletes. Safeguards in project::delete_venv (single path component, pyvenv.cfg required, symlinked venv loses only the link), mutation-checked. Found and fixed a clipped dialog (fixed-height modals cut the y/n line when paths wrap) via modal_rect sized from wrapped content, applied to all modals, with narrow-terminal regression tests. README, tool.toml evidence, STATUS, buglog, cerebrum updated. Reinstalled binary to /opt/homebrew/bin; not committed. | tools/venv-runner/src/project.rs,tools/venv-runner/src/app.rs,tools/venv-runner/src/ui.rs,tools/venv-runner/README.md,tools/venv-runner/tool.toml,.wolf/STATUS.md,.wolf/buglog.json,.wolf/cerebrum.md | 76 unit tests, clippy -D warnings, fmt pass; 100 pty checks pass on release binary; delete scenario (26 checks) also pass on the installed binary |

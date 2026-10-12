@@ -1,0 +1,18 @@
+[package]
+name = "venv-runner"
+version = "0.1.0"
+edition = "2021"
+description = "A fullscreen TUI that finds or creates a Python virtual environment and runs your project in the terminal"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+crossterm = "0.28"
+ratatui = "0.29"
+shell-words = "1"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"

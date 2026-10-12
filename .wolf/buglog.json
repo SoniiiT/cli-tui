@@ -65,10 +65,139 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-10-12"
+    },
+    {
+      "error_message": "Significant refactor of python.rs",
+      "file": "tools/venv-runner/src/python.rs",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 3→9 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-003",
+      "timestamp": "2026-10-12T20:10:50.289Z",
+      "last_seen": "2026-10-12T20:10:50.289Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "id": "venv-runner-default-python-mistaken-for-python3-minor",
+      "timestamp": "2026-10-12",
+      "error_message": "venv-runner's create form marked `3.11.16 · PATH (default)` although `python3` in the shell runs 3.14.7 (pyenv shim).",
+      "file": "tools/venv-runner/src/python.rs",
+      "root_cause": "The default interpreter is 'the first candidate on PATH named python3', implemented with `Path::file_stem() == \"python3\"`. file_stem treats the trailing `.11` of `python3.11` as an extension and returns `python3`, so every `python3.NN` matched and the first one in PATH order (~/.local/bin/python3.11, before the pyenv shims dir) won. Found only by a pty scenario that cycled the interpreter list and compared the (default) marker to `python3 -c sys.version_info`; the unit tests never asserted which entry is the default.",
+      "fix": "Replaced with `is_command(path, name)`, which compares the whole file name (minus a `.exe` suffix). Added a pure unit test (python3 / python3.exe / python vs python3.12) and an assertion in the real-machine discovery test that the single `is_default` interpreter canonicalizes to what `probe(\"python3\")` reports. Verified both new tests fail with the old file_stem logic re-introduced and pass with the fix.",
+      "tags": [
+        "venv-runner",
+        "rust",
+        "path",
+        "file_stem",
+        "python-discovery"
+      ],
+      "status": "fixed"
+    },
+    {
+      "error_message": "Incorrect value in code",
+      "file": "tools/venv-runner/src/ui.rs",
+      "root_cause": "Had \"This venv is broken: its Python executable is gon",
+      "fix": "Changed to \"This venv is broken: its Python executable is gon",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-004",
+      "timestamp": "2026-10-12T20:22:03.384Z",
+      "last_seen": "2026-10-12T20:22:03.384Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "error_message": "Wrong reference: area should be label",
+      "file": "tools/venv-runner/src/ui.rs",
+      "root_cause": "Used \"area\" instead of \"label\"",
+      "fix": "Changed area → label",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-005",
+      "timestamp": "2026-10-12T20:23:37.769Z",
+      "last_seen": "2026-10-12T20:23:37.769Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "error_message": "Wrong reference: area should be marker",
+      "file": "tools/venv-runner/src/ui.rs",
+      "root_cause": "Used \"area\" instead of \"marker\"",
+      "fix": "Changed area → marker",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-006",
+      "timestamp": "2026-10-12T20:23:37.986Z",
+      "last_seen": "2026-10-12T20:23:37.986Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "error_message": "Wrong reference: area should be python",
+      "file": "tools/venv-runner/src/ui.rs",
+      "root_cause": "Used \"area\" instead of \"python\"",
+      "fix": "Changed area → python",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "rs"
+      ],
+      "status": "candidate",
+      "observed_worktree": "/Users/antonioromeropenin/Development/cli-tui",
+      "id": "bug-007",
+      "timestamp": "2026-10-12T20:23:38.196Z",
+      "last_seen": "2026-10-12T20:23:38.196Z",
+      "occurrences": 1,
+      "related_bugs": []
+    },
+    {
+      "id": "venv-runner-modal-fixed-height-clips-confirm-line",
+      "timestamp": "2026-10-12",
+      "error_message": "In the new delete dialog for a symlinked venv the explanation and the `y delete · n or Esc keep it` line were not visible (box ended after the 'Link to' path).",
+      "file": "tools/venv-runner/src/ui.rs",
+      "root_cause": "All modals used `centered_rect(80, <fixed rows>)`. Long project paths wrap inside the box (a path is one unbreakable token, ratatui breaks it at the width), so content needed more rows than the fixed height and the bottom of the Paragraph was silently clipped. For a delete confirmation that is the line that tells you which key confirms; the create form had the same latent problem for its last line (the validation error) on narrow terminals. Found by the pty scenario for delete (symlink case), not by the first set of unit tests, which rendered at 110 columns with short temp paths.",
+      "fix": "Added `modal_rect(width_percent, lines, area)`: height = sum of `Line::width()` wrapped at the modal's inner width (+1 slack row per wrapping line) + borders, capped at the screen height. Used by the create, edit-run and delete modals. The delete dialog shows the full path (no elision) on purpose. Regression tests render the dialogs at 110x32, 80x26/28 and 60x30/32 with deeply nested project paths and assert the explanation and the confirm line are present; verified the delete-dialog tests fail when modal_rect is replaced by the old fixed height.",
+      "tags": [
+        "venv-runner",
+        "rust",
+        "ratatui",
+        "layout",
+        "wrap",
+        "modal",
+        "delete"
+      ],
+      "status": "fixed"
     }
   ],
   "applied_observations": {
-    "9b170aef-420a-48ec-aea5-41c5a63e95b2": true
+    "9b170aef-420a-48ec-aea5-41c5a63e95b2": true,
+    "829bd33e-0c89-4d1e-aba5-666d7daa0e3c": true,
+    "202a7d74-350a-427c-8d3e-7aa39659931c": true,
+    "3518c9ea-4594-46c1-8e8e-7ee043d44a53": true,
+    "6958f2e9-abe2-4eee-a2e9-43632a0c53a7": true,
+    "367a9509-3fd0-4569-8d4e-5eed79d2b9e2": true
   },
-  "next_id": 3
+  "next_id": 8
 }

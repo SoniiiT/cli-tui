@@ -7,8 +7,9 @@ A collection of standalone CLI and TUI applications for Windows, Linux, and macO
 | Tool | Purpose | Windows | Linux | macOS |
 | --- | --- | --- | --- | --- |
 | [Alias Manager](tools/alias-manager/README.md) | Discover and manage Bash/Zsh aliases from shell profiles | Unsupported | Supported | Supported |
+| [Venv Runner](tools/venv-runner/README.md) | Find or create a Python venv in a project and run it in your terminal | Unverified | Unverified | Supported |
 
-Platform statuses and evidence requirements are defined in [`docs/platform-support.md`](docs/platform-support.md). Linux and macOS are both supported for the tested Bash/Zsh core path.
+Platform statuses and evidence requirements are defined in [`docs/platform-support.md`](docs/platform-support.md). Alias Manager is supported on Linux and macOS for the tested Bash/Zsh core path; Venv Runner is verified on macOS only so far.
 
 ## Repository conventions
 

@@ -1,13 +1,13 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-10-12T19:45:09.831Z",
-    "fileCount": 20,
+    "lastScanned": "2026-10-12T20:26:13.662Z",
+    "fileCount": 31,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "f9a61321605faed2fbdac3f30519a0c714aeb41b23ededf4c28499781bfd4083",
-    "storeUpdatedAt": "2026-10-12T19:45:09.835Z",
-    "rootHash": "30edf71bb28c033d"
+    "renderedHash": "3d97cbc39affb368a2c7eab8d31588474e83c733bf8560f3df839995ab3306a0",
+    "storeUpdatedAt": "2026-10-12T20:26:13.666Z",
+    "rootHash": "4faeec2245b053e5"
   },
   "files": {
     "AGENTS.md": {
@@ -57,11 +57,11 @@
     },
     "README.md": {
       "description": "Project documentation",
-      "tokens": 709,
-      "hash": "fbe9875b6449a168",
-      "size": 2834,
-      "mtimeMs": 1791834299234.5332,
-      "updatedAt": "2026-10-12T19:44:59.269Z",
+      "tokens": 762,
+      "hash": "39ef46d547ae0c69",
+      "size": 3048,
+      "mtimeMs": 1791836025854.5676,
+      "updatedAt": "2026-10-12T20:13:45.886Z",
       "source": "hook"
     },
     "tools/_template/README.md": {
@@ -577,6 +577,747 @@
       "size": 6302,
       "mtimeMs": 1791813305448.5845,
       "updatedAt": "2026-10-12T13:55:05.473Z",
+      "source": "hook"
+    },
+    "tools/venv-runner/Cargo.toml": {
+      "description": "Rust package manifest",
+      "tokens": 99,
+      "hash": "afca54c003c2f912",
+      "size": 370,
+      "mtimeMs": 1791835157940.3857,
+      "updatedAt": "2026-10-12T19:59:17.986Z",
+      "source": "hook"
+    },
+    "tools/venv-runner/.gitignore": {
+      "description": "Git ignore rules",
+      "tokens": 3,
+      "hash": "306fd52e74fca674",
+      "size": 9,
+      "mtimeMs": 1791835158051.4575,
+      "updatedAt": "2026-10-12T19:59:18.083Z",
+      "source": "hook"
+    },
+    "tools/venv-runner/src/lib.rs": {
+      "description": "Core logic for venv-runner: project and venv detection, Python interpreter",
+      "tokens": 69,
+      "hash": "40270bdac7f16fc0",
+      "size": 258,
+      "mtimeMs": 1791835158150.443,
+      "updatedAt": "2026-10-12T19:59:18.182Z",
+      "source": "hook"
+    },
+    "tools/venv-runner/src/project.rs": {
+      "description": "Looking at a project directory: which venvs exist, what would run, and",
+      "tokens": 5794,
+      "hash": "0a5f132d7d09c84a",
+      "size": 21726,
+      "mtimeMs": 1791836449242.497,
+      "updatedAt": "2026-10-12T20:20:49.274Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "Venv",
+          "kind": "class",
+          "startLine": 9,
+          "endLine": 17,
+          "tokens": 77
+        },
+        {
+          "name": "venv_bin_dir",
+          "kind": "fn",
+          "startLine": 18,
+          "endLine": 25,
+          "tokens": 42
+        },
+        {
+          "name": "venv_python",
+          "kind": "fn",
+          "startLine": 26,
+          "endLine": 35,
+          "tokens": 86
+        },
+        {
+          "name": "scan_venvs",
+          "kind": "fn",
+          "startLine": 36,
+          "endLine": 60,
+          "tokens": 224
+        },
+        {
+          "name": "venv_rank",
+          "kind": "fn",
+          "startLine": 61,
+          "endLine": 70,
+          "tokens": 73
+        },
+        {
+          "name": "parse_pyvenv_version",
+          "kind": "fn",
+          "startLine": 71,
+          "endLine": 102,
+          "tokens": 236
+        },
+        {
+          "name": "project_markers",
+          "kind": "fn",
+          "startLine": 103,
+          "endLine": 119,
+          "tokens": 94
+        },
+        {
+          "name": "detect_entry",
+          "kind": "fn",
+          "startLine": 120,
+          "endLine": 128,
+          "tokens": 86
+        },
+        {
+          "name": "DependencySource",
+          "kind": "class",
+          "startLine": 129,
+          "endLine": 133,
+          "tokens": 24
+        },
+        {
+          "name": "DependencySource",
+          "kind": "section",
+          "startLine": 134,
+          "endLine": 152,
+          "tokens": 180
+        },
+        {
+          "name": "dependency_sources",
+          "kind": "fn",
+          "startLine": 153,
+          "endLine": 180,
+          "tokens": 311
+        },
+        {
+          "name": "has_installable_pyproject",
+          "kind": "fn",
+          "startLine": 181,
+          "endLine": 189,
+          "tokens": 96
+        },
+        {
+          "name": "requires_python",
+          "kind": "fn",
+          "startLine": 190,
+          "endLine": 199,
+          "tokens": 128
+        },
+        {
+          "name": "python_version_hint",
+          "kind": "fn",
+          "startLine": 200,
+          "endLine": 218,
+          "tokens": 198
+        },
+        {
+          "name": "validate_venv_name",
+          "kind": "fn",
+          "startLine": 219,
+          "endLine": 235,
+          "tokens": 186
+        },
+        {
+          "name": "suggest_venv_name",
+          "kind": "fn",
+          "startLine": 236,
+          "endLine": 247,
+          "tokens": 110
+        },
+        {
+          "name": "DirStats",
+          "kind": "class",
+          "startLine": 248,
+          "endLine": 254,
+          "tokens": 63
+        },
+        {
+          "name": "dir_stats",
+          "kind": "fn",
+          "startLine": 255,
+          "endLine": 277,
+          "tokens": 218
+        },
+        {
+          "name": "symlink_target",
+          "kind": "fn",
+          "startLine": 278,
+          "endLine": 291,
+          "tokens": 176
+        },
+        {
+          "name": "delete_venv",
+          "kind": "fn",
+          "startLine": 292,
+          "endLine": 614,
+          "tokens": 3518
+        }
+      ]
+    },
+    "tools/venv-runner/src/python.rs": {
+      "description": "Finding Python interpreters a new venv can be created from.",
+      "tokens": 3800,
+      "hash": "f23125bb4e1bc147",
+      "size": 14249,
+      "mtimeMs": 1791835850561.2354,
+      "updatedAt": "2026-10-12T20:10:50.593Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "Interpreter",
+          "kind": "class",
+          "startLine": 16,
+          "endLine": 23,
+          "tokens": 58
+        },
+        {
+          "name": "Interpreter",
+          "kind": "section",
+          "startLine": 24,
+          "endLine": 35,
+          "tokens": 99
+        },
+        {
+          "name": "Probe",
+          "kind": "class",
+          "startLine": 36,
+          "endLine": 42,
+          "tokens": 51
+        },
+        {
+          "name": "probe",
+          "kind": "fn",
+          "startLine": 43,
+          "endLine": 59,
+          "tokens": 156
+        },
+        {
+          "name": "parse_probe_output",
+          "kind": "fn",
+          "startLine": 60,
+          "endLine": 75,
+          "tokens": 121
+        },
+        {
+          "name": "parse_version",
+          "kind": "fn",
+          "startLine": 76,
+          "endLine": 87,
+          "tokens": 101
+        },
+        {
+          "name": "Candidate",
+          "kind": "class",
+          "startLine": 88,
+          "endLine": 92,
+          "tokens": 17
+        },
+        {
+          "name": "is_python_name",
+          "kind": "fn",
+          "startLine": 93,
+          "endLine": 104,
+          "tokens": 144
+        },
+        {
+          "name": "is_command",
+          "kind": "fn",
+          "startLine": 105,
+          "endLine": 114,
+          "tokens": 106
+        },
+        {
+          "name": "is_runnable",
+          "kind": "fn",
+          "startLine": 115,
+          "endLine": 123,
+          "tokens": 72
+        },
+        {
+          "name": "is_runnable",
+          "kind": "fn",
+          "startLine": 124,
+          "endLine": 127,
+          "tokens": 15
+        },
+        {
+          "name": "home_dir",
+          "kind": "fn",
+          "startLine": 128,
+          "endLine": 133,
+          "tokens": 40
+        },
+        {
+          "name": "sorted_dir",
+          "kind": "fn",
+          "startLine": 134,
+          "endLine": 144,
+          "tokens": 73
+        },
+        {
+          "name": "candidates",
+          "kind": "fn",
+          "startLine": 145,
+          "endLine": 192,
+          "tokens": 461
+        },
+        {
+          "name": "source_of",
+          "kind": "fn",
+          "startLine": 193,
+          "endLine": 212,
+          "tokens": 162
+        },
+        {
+          "name": "discover",
+          "kind": "fn",
+          "startLine": 213,
+          "endLine": 276,
+          "tokens": 647
+        },
+        {
+          "name": "preselect",
+          "kind": "fn",
+          "startLine": 277,
+          "endLine": 440,
+          "tokens": 1594
+        }
+      ]
+    },
+    "tools/venv-runner/src/plan.rs": {
+      "description": "Command plans: what to run to create a venv or to start the project in",
+      "tokens": 3397,
+      "hash": "c469d3271d6a7a61",
+      "size": 12740,
+      "mtimeMs": 1791835212041.8174,
+      "updatedAt": "2026-10-12T20:00:12.075Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "Step",
+          "kind": "class",
+          "startLine": 15,
+          "endLine": 22,
+          "tokens": 50
+        },
+        {
+          "name": "Step",
+          "kind": "section",
+          "startLine": 23,
+          "endLine": 54,
+          "tokens": 293
+        },
+        {
+          "name": "CreateRequest",
+          "kind": "class",
+          "startLine": 55,
+          "endLine": 61,
+          "tokens": 64
+        },
+        {
+          "name": "plan_create",
+          "kind": "fn",
+          "startLine": 62,
+          "endLine": 79,
+          "tokens": 194
+        },
+        {
+          "name": "plan_start",
+          "kind": "fn",
+          "startLine": 80,
+          "endLine": 94,
+          "tokens": 149
+        },
+        {
+          "name": "activation_env",
+          "kind": "fn",
+          "startLine": 95,
+          "endLine": 112,
+          "tokens": 164
+        },
+        {
+          "name": "RunOutcome",
+          "kind": "class",
+          "startLine": 113,
+          "endLine": 120,
+          "tokens": 85
+        },
+        {
+          "name": "run_steps",
+          "kind": "fn",
+          "startLine": 121,
+          "endLine": 147,
+          "tokens": 255
+        },
+        {
+          "name": "describe_status",
+          "kind": "fn",
+          "startLine": 148,
+          "endLine": 170,
+          "tokens": 247
+        },
+        {
+          "name": "InterruptGuard",
+          "kind": "class",
+          "startLine": 171,
+          "endLine": 178,
+          "tokens": 41
+        },
+        {
+          "name": "InterruptGuard",
+          "kind": "section",
+          "startLine": 179,
+          "endLine": 188,
+          "tokens": 96
+        },
+        {
+          "name": "InterruptGuard",
+          "kind": "section",
+          "startLine": 189,
+          "endLine": 199,
+          "tokens": 88
+        },
+        {
+          "name": "InterruptGuard",
+          "kind": "class",
+          "startLine": 200,
+          "endLine": 202,
+          "tokens": 12
+        },
+        {
+          "name": "InterruptGuard",
+          "kind": "section",
+          "startLine": 203,
+          "endLine": 373,
+          "tokens": 1753
+        }
+      ]
+    },
+    "tools/venv-runner/src/app.rs": {
+      "description": "TUI state and key handling. Nothing here touches the terminal: a key press",
+      "tokens": 9292,
+      "hash": "5054b97fa3abfeae",
+      "size": 34855,
+      "mtimeMs": 1791836506359.8057,
+      "updatedAt": "2026-10-12T20:21:46.394Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "TextInput",
+          "kind": "class",
+          "startLine": 20,
+          "endLine": 24,
+          "tokens": 21
+        },
+        {
+          "name": "TextInput",
+          "kind": "section",
+          "startLine": 25,
+          "endLine": 81,
+          "tokens": 527
+        },
+        {
+          "name": "Field",
+          "kind": "class",
+          "startLine": 82,
+          "endLine": 87,
+          "tokens": 17
+        },
+        {
+          "name": "Field",
+          "kind": "section",
+          "startLine": 88,
+          "endLine": 105,
+          "tokens": 119
+        },
+        {
+          "name": "step_index",
+          "kind": "fn",
+          "startLine": 106,
+          "endLine": 114,
+          "tokens": 75
+        },
+        {
+          "name": "FormEvent",
+          "kind": "class",
+          "startLine": 115,
+          "endLine": 121,
+          "tokens": 22
+        },
+        {
+          "name": "CreateForm",
+          "kind": "class",
+          "startLine": 122,
+          "endLine": 132,
+          "tokens": 111
+        },
+        {
+          "name": "CreateForm",
+          "kind": "section",
+          "startLine": 133,
+          "endLine": 192,
+          "tokens": 596
+        },
+        {
+          "name": "DeleteConfirm",
+          "kind": "class",
+          "startLine": 193,
+          "endLine": 202,
+          "tokens": 83
+        },
+        {
+          "name": "Screen",
+          "kind": "class",
+          "startLine": 203,
+          "endLine": 210,
+          "tokens": 44
+        },
+        {
+          "name": "Action",
+          "kind": "class",
+          "startLine": 211,
+          "endLine": 215,
+          "tokens": 27
+        },
+        {
+          "name": "Action",
+          "kind": "section",
+          "startLine": 216,
+          "endLine": 224,
+          "tokens": 58
+        },
+        {
+          "name": "Interpreters",
+          "kind": "class",
+          "startLine": 225,
+          "endLine": 229,
+          "tokens": 28
+        },
+        {
+          "name": "App",
+          "kind": "class",
+          "startLine": 230,
+          "endLine": 245,
+          "tokens": 129
+        },
+        {
+          "name": "App",
+          "kind": "section",
+          "startLine": 246,
+          "endLine": 1001,
+          "tokens": 7861
+        }
+      ]
+    },
+    "tools/venv-runner/src/ui.rs": {
+      "description": "Rendering. Pure functions of [`App`]; no state changes here.",
+      "tokens": 7264,
+      "hash": "618ba2efce2a9344",
+      "size": 27310,
+      "mtimeMs": 1791836657700.939,
+      "updatedAt": "2026-10-12T20:24:17.749Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "draw",
+          "kind": "fn",
+          "startLine": 15,
+          "endLine": 57,
+          "tokens": 417
+        },
+        {
+          "name": "draw_venv_list",
+          "kind": "fn",
+          "startLine": 58,
+          "endLine": 99,
+          "tokens": 440
+        },
+        {
+          "name": "draw_details",
+          "kind": "fn",
+          "startLine": 100,
+          "endLine": 184,
+          "tokens": 897
+        },
+        {
+          "name": "key_hints",
+          "kind": "fn",
+          "startLine": 185,
+          "endLine": 196,
+          "tokens": 164
+        },
+        {
+          "name": "draw_confirm_delete",
+          "kind": "fn",
+          "startLine": 197,
+          "endLine": 273,
+          "tokens": 761
+        },
+        {
+          "name": "format_size",
+          "kind": "fn",
+          "startLine": 274,
+          "endLine": 287,
+          "tokens": 107
+        },
+        {
+          "name": "draw_create",
+          "kind": "fn",
+          "startLine": 288,
+          "endLine": 370,
+          "tokens": 780
+        },
+        {
+          "name": "draw_edit_run",
+          "kind": "fn",
+          "startLine": 371,
+          "endLine": 408,
+          "tokens": 372
+        },
+        {
+          "name": "tilde",
+          "kind": "fn",
+          "startLine": 409,
+          "endLine": 421,
+          "tokens": 128
+        },
+        {
+          "name": "centered_rect",
+          "kind": "fn",
+          "startLine": 422,
+          "endLine": 438,
+          "tokens": 192
+        },
+        {
+          "name": "modal_rect",
+          "kind": "fn",
+          "startLine": 439,
+          "endLine": 458,
+          "tokens": 175
+        },
+        {
+          "name": "wrapped_rows",
+          "kind": "fn",
+          "startLine": 459,
+          "endLine": 467,
+          "tokens": 64
+        },
+        {
+          "name": "fit_left",
+          "kind": "fn",
+          "startLine": 468,
+          "endLine": 476,
+          "tokens": 73
+        },
+        {
+          "name": "project_name",
+          "kind": "fn",
+          "startLine": 477,
+          "endLine": 759,
+          "tokens": 3082
+        }
+      ]
+    },
+    "tools/venv-runner/src/main.rs": {
+      "description": "Declares HELP",
+      "tokens": 2419,
+      "hash": "2dda9e826e84e7f9",
+      "size": 9083,
+      "mtimeMs": 1791835686958.0483,
+      "updatedAt": "2026-10-12T20:08:07.004Z",
+      "source": "hook",
+      "symbols": [
+        {
+          "name": "Cli",
+          "kind": "class",
+          "startLine": 40,
+          "endLine": 44,
+          "tokens": 12
+        },
+        {
+          "name": "parse_args",
+          "kind": "fn",
+          "startLine": 45,
+          "endLine": 64,
+          "tokens": 218
+        },
+        {
+          "name": "main",
+          "kind": "fn",
+          "startLine": 65,
+          "endLine": 95,
+          "tokens": 297
+        },
+        {
+          "name": "Tui",
+          "kind": "class",
+          "startLine": 96,
+          "endLine": 100,
+          "tokens": 16
+        },
+        {
+          "name": "Tui",
+          "kind": "section",
+          "startLine": 101,
+          "endLine": 151,
+          "tokens": 529
+        },
+        {
+          "name": "Tui",
+          "kind": "section",
+          "startLine": 152,
+          "endLine": 157,
+          "tokens": 24
+        },
+        {
+          "name": "install_panic_hook",
+          "kind": "fn",
+          "startLine": 158,
+          "endLine": 166,
+          "tokens": 69
+        },
+        {
+          "name": "run_app",
+          "kind": "fn",
+          "startLine": 167,
+          "endLine": 200,
+          "tokens": 389
+        },
+        {
+          "name": "run_in_terminal",
+          "kind": "fn",
+          "startLine": 201,
+          "endLine": 224,
+          "tokens": 219
+        },
+        {
+          "name": "wait_for_return",
+          "kind": "fn",
+          "startLine": 225,
+          "endLine": 281,
+          "tokens": 473
+        }
+      ]
+    },
+    "tools/venv-runner/tool.toml": {
+      "description": "",
+      "tokens": 364,
+      "hash": "422afe159f511e7b",
+      "size": 1365,
+      "mtimeMs": 1791836020269.657,
+      "updatedAt": "2026-10-12T20:13:40.323Z",
+      "source": "hook"
+    },
+    "tools/venv-runner/README.md": {
+      "description": "Project documentation",
+      "tokens": 1706,
+      "hash": "d51558d99a9dfa9f",
+      "size": 6839,
+      "mtimeMs": 1791836773629.1433,
+      "updatedAt": "2026-10-12T20:26:13.662Z",
       "source": "hook"
     }
   },

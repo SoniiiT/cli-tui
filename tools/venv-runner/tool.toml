@@ -1,0 +1,17 @@
+id = "venv-runner"
+name = "Venv Runner"
+purpose = "Fullscreen TUI that finds or creates a Python virtual environment in a project and runs the project in it directly in your terminal."
+runtime = ["Python 3 with the venv and ensurepip modules (to create venvs)"]
+build = ["Rust stable (Cargo)"]
+
+[platforms.windows]
+status = "unverified"
+evidence = ""
+
+[platforms.linux]
+status = "unverified"
+evidence = ""
+
+[platforms.macos]
+status = "supported"
+evidence = "macOS 27.0.0 (Darwin) arm64, 2026-10-12: cargo test (76 passed, incl. tests that create a real venv from a real interpreter, install from a requirements file, run code inside it, and delete venvs incl. the path/symlink safeguards), cargo clippy -D warnings, cargo fmt --check, cargo build --release all passed natively. Core path exercised against the release binary in a real pty with terminal emulation (pexpect + pyte, 100 checks): venv detection incl. a broken one, create form with .python-version preselection and validation, venv creation + pip install step in the real terminal, delete with y-only confirmation (cancel keys, broken venv, symlinked venv where only the link goes and the target survives, project files untouched), start with stdin/input() and pdb working, VIRTUAL_ENV/PATH set, Ctrl+C delivered to the Python program while the TUI survives, exit codes/signals reported, quoted run arguments, a project path with a space and an umlaut, q from the return prompt, and clean alternate-screen/cursor restore on exit. Not tested: terminal resize, tmux/screen, projects on network volumes."

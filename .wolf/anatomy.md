@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T19:45:09.831Z
-> Files: 20 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T20:26:13.662Z
+> Files: 31 tracked | Anatomy hits: 0 | Misses: 0
 
 > Project structure index. Auto-maintained by OpenWolf hooks and daemon.
 > Run `openwolf scan` to generate, or wait for the first Claude Code session.
@@ -11,7 +11,7 @@
 
 - `AGENTS.md` — OpenWolf (~200 tok)
 - `CLAUDE.md` — OpenWolf (~211 tok)
-- `README.md` — Project documentation (~709 tok)
+- `README.md` — Project documentation (~762 tok)
 
 ## docs/
 
@@ -59,3 +59,20 @@
 
 - `lib.rs` — Alias: as_str, new, matches, changed (~10150 tok)
 - `main.rs` — Declares Change (~10145 tok)
+
+## tools/venv-runner/
+
+- `.gitignore` — Git ignore rules (~3 tok)
+- `Cargo.toml` — Rust package manifest (~99 tok)
+- `README.md` — Project documentation (~1706 tok)
+- `tool.toml` (~364 tok)
+
+## tools/venv-runner/src/
+
+- `app.rs` — TUI state and key handling. Nothing here touches the terminal: a key press (~9292 tok)
+- `lib.rs` — Core logic for venv-runner: project and venv detection, Python interpreter (~69 tok)
+- `main.rs` — Declares HELP (~2419 tok)
+- `plan.rs` — Command plans: what to run to create a venv or to start the project in (~3397 tok)
+- `project.rs` — Looking at a project directory: which venvs exist, what would run, and (~5794 tok)
+- `python.rs` — Finding Python interpreters a new venv can be created from. (~3800 tok)
+- `ui.rs` — Rendering. Pure functions of [`App`]; no state changes here. (~7264 tok)
