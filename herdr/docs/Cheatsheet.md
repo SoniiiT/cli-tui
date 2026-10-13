@@ -22,6 +22,7 @@ Das Herdr-Präfix ist **Ctrl+Space**: erst Ctrl+Space drücken und loslassen, da
 | Terminal Code | `Ctrl+Space`, dann `Shift+T` | Tode im bereits fokussierten Herdr-Pane öffnen; Herdr legt keine weitere Aufteilung an. |
 | Zoetrope | `Ctrl+Space`, dann `Shift+Z` | Graph einer Claude-Code- oder Codex-Session als Overlay öffnen; OpenCode wird nicht unterstützt. |
 | Memex | Kein Shortcut eingerichtet | Session-Palette per Herdr-Aktion; Snapshot-Sync läuft vor dem Öffnen. |
+| Herdr Web UI | Kein Shortcut nötig | Startet mit Herdr; im Browser <http://127.0.0.1:7317> öffnen. |
 
 `Ctrl+Space`, dann `Shift+C` bleibt `new_workspace`; Hunk Diff hat für den letzten Commit daher
 keinen Shortcut. Die Aktion ist weiter direkt verfügbar:
@@ -240,6 +241,29 @@ Danach die Herdr-Konfiguration neu laden:
 ```bash
 herdr server reload-config
 ```
+
+## Herdr Web UI öffnen und testen
+
+Das Plugin startet beim Herdr-Start einen lokalen Server; die Web-UI ist dann unter
+<http://127.0.0.1:7317> erreichbar. Dort erscheinen alle Workspaces, Tabs und Panes mit Agent-Status;
+Claude-Code- und Codex-Panes lassen sich als Chat oder als Live-Terminal bedienen.
+
+```bash
+# läuft der Server?
+curl -s http://127.0.0.1:7317/api/health
+
+# starten, stoppen, Status (z. B. nach Änderungen an der .env im Config-Verzeichnis)
+herdr plugin action invoke devswha.herdr-web-ui.start
+herdr plugin action invoke devswha.herdr-web-ui.stop
+herdr plugin action invoke devswha.herdr-web-ui.status
+
+# Handy-Zugriff einrichten (Adresse + QR-Code; ändert ggf. tailscale serve)
+herdr plugin action invoke devswha.herdr-web-ui.phone
+```
+
+`Connection refused` heißt, der Server läuft nicht: `status`-Aktion ausführen und `herdr plugin log
+list` prüfen. Port belegt: `PORT=…` in `$(herdr plugin config-dir devswha.herdr-web-ui)/.env` setzen,
+dann stoppen und starten.
 
 ## Plugin-Aktionen direkt aufrufen
 

@@ -1,11 +1,12 @@
 # Herdr und Plugins (Arch/Omarchy und macOS)
 
-Diese Anleitung beschreibt Herdr als Terminal-Workspace für Coding-Agents und zehn getrennte
+Diese Anleitung beschreibt Herdr als Terminal-Workspace für Coding-Agents und zwölf getrennte
 Herdr-Plugins. Sie ersetzt nicht Herdrs eigene Konfiguration: `~/.config/herdr/config.toml` bleibt
 die maßgebliche Live-Datei. Vor Änderungen daran immer die vorhandenen `[keys]`, `[ui]`- und
 `[theme]`-Einträge lesen und nur fehlende eigene Einstellungen ergänzen. Alle hier dokumentierten
 Plugins sind als `platforms = ["linux", "macos"]` (oder reiner macOS-Plugin-Code) manifestiert und
 auf beiden Betriebssystemen getestet; einzelne Linux-only-Workarounds sind explizit markiert.
+Ausnahme: Herdr Web UI ist bisher nur unter macOS geprüft.
 
 > Schnellübersicht der Plugin-Tastenkürzel und CLI-Aktionen: [Cheatsheet.md](docs/Cheatsheet.md).
 
@@ -24,6 +25,7 @@ auf beiden Betriebssystemen getestet; einzelne Linux-only-Workarounds sind expli
 | Terminal Code (`zenbu-labs.tode`) | VS Code im Terminal, ersetzt die Shell im fokussierten Pane ohne zusätzlichen Split. |
 | Zoetrope (`furkankly.zoetrope`) | Sitzungsgraph einer Claude-Code- oder Codex-Session als Overlay/Split/Tab. OpenCode wird nicht unterstützt. |
 | Herdr Auto Title (`herdr.auto-title`) | Benennt Tabs und Panes automatisch nach Projekt, Git-Branch, Programm und Agent-Aufgabe. Manuell vergebene Namen bleiben erhalten. |
+| Herdr Web UI (`devswha.herdr-web-ui`) | Browser- und Handy-Client für die laufenden Herdr-Panes: Agent-Sessions als Chat, Live-Terminal, Freigaben per Tipp, Push-Alerts. Lokal unter `http://127.0.0.1:7317`. |
 
 Firstmate und Captain’s Deck gehören **nicht** zu diesem Setup. Captain’s Deck ist ein Firstmate-Board
 und für ein persönliches Ideenboard nicht erforderlich.
@@ -47,6 +49,8 @@ und für ein persönliches Ideenboard nicht erforderlich.
 - `jq` für Zoetrope; `zoe` installiert das Plugin selbst über Homebrew oder Cargo, falls es fehlt.
   Zoetrope braucht außerdem eine aktuelle Herdr-Integration für Claude Code oder Codex
   (`herdr integration status`; OpenCode wird nicht unterstützt).
+- Bun 1.4+ und Node.js 18+ für Herdr Web UI (macOS: `brew install bun`). Die Plugin-Skripte suchen
+  Bun auch außerhalb des Herdr-`PATH` (Homebrew, `~/.bun/bin`, Mise-Shims).
 
 Vor dem Installieren:
 
@@ -78,6 +82,7 @@ herdr plugin install zenbu-labs/terminal-browser/herdr-plugin
 herdr plugin install zenbu-labs/terminal-code/herdr-plugin
 herdr plugin install furkankly/zoetrope/herdr-plugin
 herdr plugin install kryptamine/herdr-auto-title
+herdr plugin install devswha/herdr-web-ui
 ```
 
 Auto Title benötigt nach der Installation einmalig einen Start, weil Herdr Plugins nur beim
@@ -285,6 +290,39 @@ Detaillierte Bedienung, Fehlerbilder und Beispielaufrufe für alle fünf stehen 
   Herdr-Integration für den jeweiligen Agenten (`herdr integration status`). Keybinding per
   `herdr plugin action invoke setup-keys --plugin furkankly.zoetrope` einrichten lassen, statt es von
   Hand in `config.toml` zu schreiben — das sichert die Konfiguration vorher und prüft freie Tasten.
+
+## Herdr Web UI: Browser- und Handy-Zugriff
+
+[herdr-web-ui](https://github.com/devswha/herdr-web-ui) ist ein Browser-/PWA-Client für die Herdr-Panes,
+die ohnehin laufen. Es ersetzt die Herdr-TUI nicht; beide hängen gleichzeitig an denselben Terminals.
+Claude Code und Codex erscheinen als Chat (aus ihrem eigenen Transcript), OpenCode 2 ebenfalls, wenn
+Herdr die Session erkennt; alle anderen Programme als Live-Terminal. Getestet auf macOS mit Herdr 0.9.3,
+Bun 1.4.2 und Plugin-Version 0.4.8.
+
+Installation **ohne** den `curl | sh`-Einzeiler aus dem Upstream-README: Der installiert fehlende
+Werkzeuge selbst und ändert die Tailscale-Konfiguration (`tailscale serve`). Stattdessen:
+
+```bash
+herdr plugin install devswha/herdr-web-ui --yes
+herdr plugin action invoke devswha.herdr-web-ui.start
+curl -s http://127.0.0.1:7317/api/health   # erwartet "ok":true
+```
+
+Danach im Browser <http://127.0.0.1:7317> öffnen. Ab dem nächsten Herdr-Start startet das Plugin
+automatisch.
+
+- **Nur lokal:** Der Server bindet standardmäßig an `127.0.0.1` und verlangt dort keine Anmeldung.
+  Nie an `0.0.0.0` oder eine LAN-Adresse binden, ohne `HERDR_WEB_TOKEN` zu setzen: Wer den Port
+  erreicht, kann in die Terminals tippen.
+- **Handy:** Erst bewusst entscheiden, dann `tailscale serve --bg --https=443 http://127.0.0.1:7317`
+  oder die Plugin-Aktion **Phone setup** (zeigt Adresse und QR-Code). Ohne HTTPS lässt sich die PWA
+  nicht installieren und es kommen keine Push-Alerts. Zurücknehmen mit `tailscale serve --https=443 off`.
+- **Einstellungen** (`PORT`, `HERDR_WEB_TOKEN` usw.) kommen nicht aus der Shell, sondern als
+  `KEY=value`-Zeilen in `$(herdr plugin config-dir devswha.herdr-web-ui)/.env`. Danach die Aktionen
+  `stop` und `start` ausführen.
+- **Telemetrie:** Die App schickt bei Installation und Update eine anonyme Zählung (Version, OS,
+  Zufalls-ID). Abschalten unter **Settings → About → Anonymous usage counts**.
+- **Updates** laufen in der App (Settings → About) und lassen die Agents weiterlaufen.
 
 ## Pane-Rahmen und Agents-Liste (Harness-Guides)
 
