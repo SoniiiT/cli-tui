@@ -14,9 +14,11 @@ A fullscreen TUI for Python projects. Open it in a project directory:
 
 ```sh
 cargo build --release --manifest-path tools/venv-runner/Cargo.toml
-cp tools/venv-runner/target/release/venv-runner /opt/homebrew/bin/   # or any directory on your PATH
+install -m 755 tools/venv-runner/target/release/venv-runner /opt/homebrew/bin/   # or any directory on your PATH
 # alternatively: cargo install --path tools/venv-runner
 ```
+
+Updating an installed copy: close running Venv Runner sessions first, and replace the file with `install` (which installs a new file) or `cargo install`, never with a plain `cp` over the old one. On macOS, overwriting a binary in place while it runs makes the next launch get killed (`Killed: 9`, exit 137) and can kill the running sessions.
 
 Run it in a project, or point it at one:
 
@@ -57,6 +59,20 @@ Press **n** (or select *+ New virtual environment…*) to open the form:
 
 **Enter** creates the venv. This also happens in the real terminal (`python -m venv NAME`, then `NAME/bin/python -m pip install ...`), so you see pip's output and any error exactly as in a shell.
 
+### Updating
+
+Press **u** on a venv to bring it up to date, in place. This is the creation recipe applied to the existing venv, so the defaults give you what a fresh venv would get:
+
+| Field | What it does |
+| --- | --- |
+| Dependencies | The source to install again: a `requirements*.txt`, an installable `pyproject.toml`/`setup.py` (`pip install -e .`), or none. The first detected source is preselected. |
+| Upgrade pip | `python -m pip install --upgrade pip`. On by default. |
+| Packages | *upgrade to the newest versions allowed* (default) runs `pip install --upgrade --upgrade-strategy eager`, which also moves dependencies of your dependencies forward, like a fresh install would resolve them. *install what is missing only* leaves installed packages alone. |
+
+The dialog lists the exact commands that will run and updates the list as you change the choices. **Enter** runs them in the real terminal, so you see pip's output and errors as in a shell; afterwards you return to the TUI. `←`/`→` or Space change a choice, Esc cancels.
+
+Updating does not remove packages that are no longer required (pip never does), and it does not change the venv's Python version. For a clean slate, or to move to another Python, delete the venv (`d`) and create a new one (`n`). A broken venv cannot be updated because pip cannot run in it; the TUI says so and points to delete + new.
+
 ### Deleting
 
 Select a venv and press **d** (or `Delete`). A confirmation shows the folder, its Python version and how many files and how much disk space it holds. Only **y** deletes; Enter, `n` and Esc keep the venv. Broken venvs can be deleted like any other, which is the way to get rid of one before creating a replacement.
@@ -70,6 +86,7 @@ Deleting is the only destructive action, so it is deliberately narrow: it remove
 | `↑`/`↓`, `j`/`k` | Select venv / new-venv row |
 | `Enter`, `s` | Start the selected venv (on the new-venv row: open the form) |
 | `n` | New venv |
+| `u` | Update the selected venv: upgrade pip and (re)install the dependencies |
 | `d`, `Delete` | Delete the selected venv (asks first; `y` confirms) |
 | `e` | Edit the run command |
 | `r` | Rescan the project |
@@ -83,7 +100,7 @@ Deleting is the only destructive action, so it is deliberately narrow: it remove
 
 - Venvs are created with `python -m venv`, never with `uv`/`virtualenv`; uv-managed Pythons are offered as interpreters, though.
 - If creating the venv itself fails, the half-built folder is removed. If only the dependency install fails, the venv is kept and the status line says so, so you can fix `requirements.txt` and install manually or create it again under another name.
-- There is no one-step "recreate": delete the venv (`d`), then create a new one (`n`).
+- There is no one-step "recreate": delete the venv (`d`), then create a new one (`n`). Update (`u`) works in place and never removes packages or changes the Python version.
 - The run command is not a shell line: quoting is understood, but pipes, globs, `$VAR` expansion and `&&` are not.
 - The run command is not remembered between sessions. Only direct subfolders of the project are scanned for venvs.
 - `.python-version` and `requires-python` only preselect or hint; they are not enforced.
@@ -104,7 +121,7 @@ The tests include ones that create a real venv from the Python found on the mach
 
 | Platform | Status | Evidence |
 | --- | --- | --- |
-| macOS | `supported` | macOS 27.0.0 (Darwin) arm64, tested 2026-10-12. `cargo test` (76 tests), Clippy, `cargo fmt --check` and release build native; the release binary's core path (detect, create, start with `input()`/`pdb`, Ctrl+C, exit codes, delete with confirmation, paths with spaces) was exercised in a real pty. |
+| macOS | `supported` | macOS 27.0.0 (Darwin) arm64, tested 2026-10-12. `cargo test` (93 tests), Clippy, `cargo fmt --check` and release build native; the release binary's core path (detect, create, update, start with `input()`/`pdb`, Ctrl+C, exit codes, delete with confirmation, paths with spaces) was exercised in a real pty. |
 | Linux | `unverified` | Not tested yet. |
 | Windows | `unverified` | Not tested yet; see limitations above. |
 

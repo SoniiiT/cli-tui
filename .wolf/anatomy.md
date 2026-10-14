@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-10-12T20:26:13.662Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-10-14T12:25:43.345Z
 > Files: 31 tracked | Anatomy hits: 0 | Misses: 0
 
 > Project structure index. Auto-maintained by OpenWolf hooks and daemon.
@@ -72,7 +72,7 @@
 - `app.rs` — TUI state and key handling. Nothing here touches the terminal: a key press (~9292 tok)
 - `lib.rs` — Core logic for venv-runner: project and venv detection, Python interpreter (~69 tok)
 - `main.rs` — Declares HELP (~2419 tok)
-- `plan.rs` — Command plans: what to run to create a venv or to start the project in (~3397 tok)
+- `plan.rs` — Command plans: what to run to create a venv or to start the project in (~5610 tok)
 - `project.rs` — Looking at a project directory: which venvs exist, what would run, and (~5794 tok)
 - `python.rs` — Finding Python interpreters a new venv can be created from. (~3800 tok)
 - `ui.rs` — Rendering. Pure functions of [`App`]; no state changes here. (~7264 tok)

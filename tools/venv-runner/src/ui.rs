@@ -10,14 +10,23 @@ use ratatui::widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragra
 use ratatui::Frame;
 use venv_runner::project::venv_python;
 
-use crate::app::{App, CreateForm, DeleteConfirm, Field, Screen, TextInput};
+use crate::app::{
+    App, CreateForm, DeleteConfirm, Field, Screen, TextInput, UpdateField, UpdateForm,
+};
 
 pub fn draw(frame: &mut Frame<'_>, app: &App) {
+    // The key list grows with every feature, so let it wrap on narrow
+    // terminals instead of cutting off the last keys.
+    let hints = key_hints(app);
+    let hint_rows = wrapped_rows(
+        Line::from(hints).width(),
+        usize::from(frame.area().width.saturating_sub(2)).max(1),
+    );
     let layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Min(8),
-            Constraint::Length(3),
+            Constraint::Length(u16::try_from(hint_rows + 2).unwrap_or(3)),
             Constraint::Length(3),
         ])
         .split(frame.area());
@@ -29,11 +38,13 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
     draw_details(frame, app, main[1]);
 
     frame.render_widget(
-        Paragraph::new(key_hints(app)).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(" Key bindings "),
-        ),
+        Paragraph::new(hints)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(" Key bindings "),
+            )
+            .wrap(Wrap { trim: true }),
         layout[1],
     );
     let (status, style) = match &app.status {
@@ -52,6 +63,7 @@ pub fn draw(frame: &mut Frame<'_>, app: &App) {
         Screen::Create(form) => draw_create(frame, app, form),
         Screen::EditRun(input) => draw_edit_run(frame, app, input),
         Screen::ConfirmDelete(confirm) => draw_confirm_delete(frame, confirm),
+        Screen::Update(form) => draw_update(frame, app, form),
     }
 }
 
@@ -185,13 +197,125 @@ fn draw_details(frame: &mut Frame<'_>, app: &App, area: Rect) {
 fn key_hints(app: &App) -> &'static str {
     match &app.screen {
         Screen::List if app.selected_venv().is_some() => {
-            "↑/↓ select · Enter start · n new · d delete · e edit run command · r rescan · q quit"
+            "↑/↓ select · Enter start · n new · u update · d delete · e edit run command · r rescan · q quit"
         }
         Screen::List => "↑/↓ select · Enter new venv · e edit run command · r rescan · q quit",
         Screen::Create(_) => "Tab/↑/↓ field · ←/→ change choice · Enter create · Esc cancel",
         Screen::EditRun(_) => "Enter save · Esc cancel · Ctrl+U clear",
         Screen::ConfirmDelete(_) => "y delete · n or Esc keep it",
+        Screen::Update(_) => {
+            "Tab/↑/↓ field · ←/→ or Space change · Enter update · Esc cancel"
+        }
     }
+}
+
+fn draw_update(frame: &mut Frame<'_>, app: &App, form: &UpdateForm) {
+    let marker = |field: UpdateField| if form.field == field { "› " } else { "  " };
+    let choice_style = |field: UpdateField| {
+        if form.field == field {
+            Style::default().add_modifier(Modifier::BOLD)
+        } else {
+            Style::default()
+        }
+    };
+    let dim = Style::default().fg(Color::DarkGray);
+    let dependencies = form
+        .dependencies()
+        .map_or_else(|| "none".to_owned(), |source| source.label());
+    let packages = if form.dependencies().is_none() {
+        "unused without a dependency source".to_owned()
+    } else if form.upgrade_packages {
+        "upgrade to the newest versions allowed".to_owned()
+    } else {
+        "install what is missing only".to_owned()
+    };
+    let version = form.python_version.as_deref().unwrap_or("?");
+
+    let mut lines = vec![
+        Line::from(Span::styled(
+            format!("Update {} (Python {version})", form.name),
+            Style::default().add_modifier(Modifier::BOLD),
+        )),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw(format!(
+                "{}Dependencies: ",
+                marker(UpdateField::Dependencies)
+            )),
+            Span::styled(
+                format!("◀ {dependencies} ▶"),
+                choice_style(UpdateField::Dependencies),
+            ),
+        ]),
+        Line::from(vec![
+            Span::raw(format!("{}Upgrade pip:  ", marker(UpdateField::UpgradePip))),
+            Span::styled(
+                format!("◀ {} ▶", if form.upgrade_pip { "yes" } else { "no" }),
+                choice_style(UpdateField::UpgradePip),
+            ),
+        ]),
+        Line::from(vec![
+            Span::raw(format!("{}Packages:     ", marker(UpdateField::Packages))),
+            Span::styled(
+                format!("◀ {packages} ▶"),
+                choice_style(UpdateField::Packages),
+            ),
+        ]),
+        Line::from(""),
+    ];
+    let steps = form.steps(&app.project);
+    if steps.is_empty() {
+        lines.push(Line::from(Span::styled(
+            "Nothing is selected, so nothing would run.",
+            Style::default().fg(Color::Yellow),
+        )));
+    } else {
+        lines.push(Line::from(Span::styled("Will run:", dim)));
+        lines.extend(
+            steps
+                .iter()
+                .map(|step| Line::from(Span::raw(format!("  $ {}", step.display())))),
+        );
+    }
+    if form.dependency_options.len() == 1 {
+        lines.push(Line::from(""));
+        lines.push(Line::from(Span::styled(
+            "No requirements file or installable pyproject.toml found: only pip itself can be updated.",
+            dim,
+        )));
+    }
+    if let Some(target) = &form.symlink_target {
+        lines.push(Line::from(""));
+        lines.push(Line::from(Span::styled(
+            format!(
+                "This venv is a symlink to {}: packages are installed there.",
+                tilde(target)
+            ),
+            Style::default().fg(Color::Yellow),
+        )));
+    }
+    lines.push(Line::from(""));
+    lines.push(Line::from(Span::styled(
+        "Packages that are no longer required stay installed; for a clean slate delete the venv and create a new one.",
+        dim,
+    )));
+    lines.push(Line::from(Span::styled(
+        form.error.as_deref().unwrap_or(""),
+        Style::default().fg(Color::Red),
+    )));
+
+    let area = modal_rect(80, &lines, frame.area());
+    frame.render_widget(Clear, area);
+    frame.render_widget(
+        Paragraph::new(lines)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title(" Update virtual environment "),
+            )
+            .wrap(Wrap { trim: false }),
+        area,
+    );
 }
 
 fn draw_confirm_delete(frame: &mut Frame<'_>, confirm: &DeleteConfirm) {
@@ -720,6 +844,79 @@ mod tests {
             6,
             "capped to the screen"
         );
+    }
+
+    fn press_key(app: &mut App, ch: char) {
+        app.handle_key(crossterm::event::KeyEvent::new(
+            crossterm::event::KeyCode::Char(ch),
+            crossterm::event::KeyModifiers::NONE,
+        ));
+    }
+
+    #[test]
+    fn the_update_dialog_shows_the_choices_and_the_exact_commands() {
+        let project = tempdir().unwrap();
+        let venv = project.path().join(".venv-abc");
+        fs::create_dir_all(venv_bin_dir(&venv)).unwrap();
+        fs::write(venv.join("pyvenv.cfg"), "version = 3.12.4\n").unwrap();
+        fs::write(venv_python(&venv), "").unwrap();
+        fs::write(project.path().join("requirements.txt"), "").unwrap();
+        let mut app = App::new(project.path().to_path_buf(), interpreters());
+
+        press_key(&mut app, 'u');
+        let screen = render(&app);
+
+        assert!(screen.contains("Update virtual environment"));
+        assert!(screen.contains("Update .venv-abc (Python 3.12.4)"));
+        assert!(screen.contains("◀ requirements.txt ▶"));
+        assert!(screen.contains("Upgrade pip:"));
+        assert!(screen.contains("$ .venv-abc/bin/python -m pip install --upgrade pip"));
+        assert!(screen.contains("--upgrade-strategy eager"));
+        assert!(
+            screen.contains("stay installed"),
+            "leftover-packages note: {screen}"
+        );
+    }
+
+    /// The update dialog lists full command lines, which wrap on narrow
+    /// terminals; the note and the commands must still be fully on screen.
+    #[test]
+    fn the_update_dialog_is_not_cut_off_on_narrow_terminals() {
+        let (_root, project) = venv_in_a_deeply_nested_project();
+        fs::write(project.join("requirements.txt"), "").unwrap();
+        for (width, height) in [(110, 34), (80, 32), (60, 36)] {
+            let mut app = App::new(project.clone(), interpreters());
+            press_key(&mut app, 'u');
+
+            let screen = render_sized(&app, width, height);
+
+            assert!(
+                screen.contains("Update virtual environment"),
+                "{width}x{height}"
+            );
+            assert!(
+                screen.contains("clean slate"),
+                "last note cut off at {width}x{height}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_key_bar_wraps_instead_of_losing_keys_on_narrow_terminals() {
+        let (_root, project) = venv_in_a_deeply_nested_project();
+        let app = App::new(project, interpreters());
+
+        for width in [110, 70, 50] {
+            let screen = render_sized(&app, width, 30);
+
+            // Single words: the bar wraps at spaces, so "d delete" may be split
+            // over two rows while every key is still there.
+            for word in [
+                "select", "start", "new", "update", "delete", "rescan", "quit",
+            ] {
+                assert!(screen.contains(word), "{word:?} lost at width {width}");
+            }
+        }
     }
 
     #[test]

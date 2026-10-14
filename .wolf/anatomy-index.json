@@ -1,13 +1,13 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-10-12T20:26:13.662Z",
+    "lastScanned": "2026-10-14T12:25:43.345Z",
     "fileCount": 31,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "3d97cbc39affb368a2c7eab8d31588474e83c733bf8560f3df839995ab3306a0",
-    "storeUpdatedAt": "2026-10-12T20:26:13.666Z",
-    "rootHash": "4faeec2245b053e5"
+    "renderedHash": "e2917cdd0e9d0c5224da254ba3dc82b40320101cc333b3fc458ba933249b3016",
+    "storeUpdatedAt": "2026-10-14T12:25:43.350Z",
+    "rootHash": "abcce173c5651456"
   },
   "files": {
     "AGENTS.md": {
@@ -889,11 +889,11 @@
     },
     "tools/venv-runner/src/plan.rs": {
       "description": "Command plans: what to run to create a venv or to start the project in",
-      "tokens": 3397,
-      "hash": "c469d3271d6a7a61",
-      "size": 12740,
-      "mtimeMs": 1791835212041.8174,
-      "updatedAt": "2026-10-12T20:00:12.075Z",
+      "tokens": 5610,
+      "hash": "214383c1d1a15072",
+      "size": 21039,
+      "mtimeMs": 1791980743298.1292,
+      "updatedAt": "2026-10-14T12:25:43.345Z",
       "source": "hook",
       "symbols": [
         {
@@ -907,92 +907,106 @@
           "name": "Step",
           "kind": "section",
           "startLine": 23,
-          "endLine": 54,
-          "tokens": 293
+          "endLine": 57,
+          "tokens": 304
         },
         {
           "name": "CreateRequest",
           "kind": "class",
-          "startLine": 55,
-          "endLine": 61,
+          "startLine": 58,
+          "endLine": 64,
           "tokens": 64
         },
         {
           "name": "plan_create",
           "kind": "fn",
-          "startLine": 62,
-          "endLine": 79,
-          "tokens": 194
+          "startLine": 65,
+          "endLine": 80,
+          "tokens": 154
+        },
+        {
+          "name": "UpdateRequest",
+          "kind": "class",
+          "startLine": 81,
+          "endLine": 94,
+          "tokens": 190
+        },
+        {
+          "name": "plan_update",
+          "kind": "fn",
+          "startLine": 95,
+          "endLine": 121,
+          "tokens": 268
         },
         {
           "name": "plan_start",
           "kind": "fn",
-          "startLine": 80,
-          "endLine": 94,
+          "startLine": 122,
+          "endLine": 136,
           "tokens": 149
         },
         {
           "name": "activation_env",
           "kind": "fn",
-          "startLine": 95,
-          "endLine": 112,
+          "startLine": 137,
+          "endLine": 154,
           "tokens": 164
         },
         {
           "name": "RunOutcome",
           "kind": "class",
-          "startLine": 113,
-          "endLine": 120,
+          "startLine": 155,
+          "endLine": 162,
           "tokens": 85
         },
         {
           "name": "run_steps",
           "kind": "fn",
-          "startLine": 121,
-          "endLine": 147,
+          "startLine": 163,
+          "endLine": 189,
           "tokens": 255
         },
         {
           "name": "describe_status",
           "kind": "fn",
-          "startLine": 148,
-          "endLine": 170,
+          "startLine": 190,
+          "endLine": 212,
           "tokens": 247
         },
         {
           "name": "InterruptGuard",
           "kind": "class",
-          "startLine": 171,
-          "endLine": 178,
+          "startLine": 213,
+          "endLine": 220,
           "tokens": 41
         },
         {
           "name": "InterruptGuard",
           "kind": "section",
-          "startLine": 179,
-          "endLine": 188,
+          "startLine": 221,
+          "endLine": 230,
           "tokens": 96
         },
         {
           "name": "InterruptGuard",
           "kind": "section",
-          "startLine": 189,
-          "endLine": 199,
+          "startLine": 231,
+          "endLine": 241,
           "tokens": 88
         },
         {
           "name": "InterruptGuard",
           "kind": "class",
-          "startLine": 200,
-          "endLine": 202,
+          "startLine": 242,
+          "endLine": 244,
           "tokens": 12
         },
         {
           "name": "InterruptGuard",
           "kind": "section",
-          "startLine": 203,
-          "endLine": 373,
-          "tokens": 1753
+          "startLine": 245,
+          "endLine": 616,
+          "tokens": 3695
         }
       ]
     },

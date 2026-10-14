@@ -125,3 +125,28 @@ description: chronological action log per session, consolidated weekly
 | 22:26 | Edited tools/venv-runner/README.md | inline fix | ~67 |
 <!-- session:M2VjNGM2Y2ItMWNkMi00NDc3LWFiODgtZTJjODQ5ZWMyNDYw -->
 | 2026-10-12T20:27:12.019Z | Added delete to venv-runner: d/Delete opens a confirmation dialog (folder, version, files+size), only y deletes. Safeguards in project::delete_venv (single path component, pyvenv.cfg required, symlinked venv loses only the link), mutation-checked. Found and fixed a clipped dialog (fixed-height modals cut the y/n line when paths wrap) via modal_rect sized from wrapped content, applied to all modals, with narrow-terminal regression tests. README, tool.toml evidence, STATUS, buglog, cerebrum updated. Reinstalled binary to /opt/homebrew/bin; not committed. | tools/venv-runner/src/project.rs,tools/venv-runner/src/app.rs,tools/venv-runner/src/ui.rs,tools/venv-runner/README.md,tools/venv-runner/tool.toml,.wolf/STATUS.md,.wolf/buglog.json,.wolf/cerebrum.md | 76 unit tests, clippy -D warnings, fmt pass; 100 pty checks pass on release binary; delete scenario (26 checks) also pass on the installed binary |
+| 22:38 | Session end: 45 writes across 11 files (Cargo.toml, .gitignore, lib.rs, project.rs, python.rs) | 1 reads | ~37688 tok |
+
+## Session: 2026-10-13 14:13
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-10-14 14:22
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-10-14 14:22
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-10-14 14:22
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:25 | Edited tools/venv-runner/src/plan.rs | modified plan_update() | ~432 |
+| 14:25 | Edited tools/venv-runner/src/plan.rs | modified update_displays() | ~1791 |
+<!-- session:M2VjNGM2Y2ItMWNkMi00NDc3LWFiODgtZTJjODQ5ZWMyNDYw -->
+| 2026-10-14T12:36:41.320Z | Added u = update to venv-runner: in-place update of an existing venv (optional pip upgrade + pip install of the detected dependency source, eager upgrade by default, or install-missing-only), dialog with live preview of the exact commands, refuses broken venvs, never removes packages or changes Python. plan_update in plan.rs, UpdateForm/Screen::Update/Action::Update in app.rs, draw_update in ui.rs; key bar now wraps on narrow terminals. README, tool.toml evidence, STATUS, cerebrum updated. Incident: cp over the installed binary while the user had 10 TUIs running made new launches die with SIGKILL; reinstalled via rm+install (new inode), documented install instead of cp. Not committed. | tools/venv-runner/src/plan.rs,tools/venv-runner/src/app.rs,tools/venv-runner/src/ui.rs,tools/venv-runner/README.md,tools/venv-runner/tool.toml,.wolf/STATUS.md,.wolf/cerebrum.md | 93 unit tests, clippy -D warnings, fmt pass; 138 pty checks pass on release binary; update scenario (38 checks) also passes on the installed binary incl. a real network pip upgrade |

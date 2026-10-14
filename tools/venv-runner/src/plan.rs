@@ -77,6 +77,43 @@ pub fn plan_create(project: &Path, request: &CreateRequest<'_>) -> Vec<Step> {
     steps
 }
 
+/// What to bring up to date in an existing venv.
+pub struct UpdateRequest<'a> {
+    pub venv: &'a Path,
+    pub upgrade_pip: bool,
+    /// `true`: move packages to the newest versions the requirements allow,
+    /// including their dependencies, which is what a fresh venv would
+    /// resolve to. `false`: only install what is missing.
+    pub upgrade_packages: bool,
+    pub dependencies: Option<&'a DependencySource>,
+}
+
+/// Updating is the creation recipe applied in place: optionally upgrade pip,
+/// then run `pip install` for the dependency source again. Empty when there
+/// is nothing to do. Packages that are no longer required stay installed;
+/// pip never removes them, only a fresh venv starts clean.
+pub fn plan_update(project: &Path, request: &UpdateRequest<'_>) -> Vec<Step> {
+    let python = venv_python(request.venv);
+    let mut steps = Vec::new();
+    if request.upgrade_pip {
+        steps.push(Step::new(
+            &python,
+            &["-m", "pip", "install", "--upgrade", "pip"],
+            project,
+        ));
+    }
+    if let Some(source) = request.dependencies {
+        let mut step = Step::new(&python, &["-m", "pip", "install"], project);
+        if request.upgrade_packages {
+            step.args
+                .extend(["--upgrade", "--upgrade-strategy", "eager"].map(str::to_owned));
+        }
+        step.args.extend(source.pip_args());
+        steps.push(step);
+    }
+    steps
+}
+
 /// Runs the venv's own interpreter with `run_line` as its arguments
 /// (`main.py`, `main.py --debug`, `-m uvicorn app:app --reload`), with the
 /// environment an activated venv would have.
@@ -375,6 +412,188 @@ mod tests {
             1,
             "second step must not run: {log}"
         );
+    }
+
+    fn update_displays(request: &UpdateRequest<'_>) -> Vec<String> {
+        plan_update(Path::new("/work/proj"), request)
+            .iter()
+            .map(Step::display)
+            .collect()
+    }
+
+    #[test]
+    fn update_plan_upgrades_pip_then_reinstalls_the_requirements_eagerly() {
+        let source = DependencySource::Requirements("requirements.txt".to_owned());
+
+        let steps = update_displays(&UpdateRequest {
+            venv: Path::new("/work/proj/.venv"),
+            upgrade_pip: true,
+            upgrade_packages: true,
+            dependencies: Some(&source),
+        });
+
+        assert_eq!(
+            steps,
+            [
+                ".venv/bin/python -m pip install --upgrade pip",
+                ".venv/bin/python -m pip install --upgrade --upgrade-strategy eager -r requirements.txt",
+            ]
+        );
+    }
+
+    #[test]
+    fn update_plan_can_skip_pip_and_only_install_what_is_missing() {
+        let source = DependencySource::Requirements("requirements-dev.txt".to_owned());
+
+        let steps = update_displays(&UpdateRequest {
+            venv: Path::new("/work/proj/.venv"),
+            upgrade_pip: false,
+            upgrade_packages: false,
+            dependencies: Some(&source),
+        });
+
+        assert_eq!(
+            steps,
+            [".venv/bin/python -m pip install -r requirements-dev.txt"]
+        );
+    }
+
+    #[test]
+    fn update_plan_keeps_a_project_install_editable() {
+        let source = DependencySource::Project("pyproject.toml");
+
+        let steps = update_displays(&UpdateRequest {
+            venv: Path::new("/work/proj/.venv"),
+            upgrade_pip: false,
+            upgrade_packages: true,
+            dependencies: Some(&source),
+        });
+
+        assert_eq!(
+            steps,
+            [".venv/bin/python -m pip install --upgrade --upgrade-strategy eager -e ."]
+        );
+    }
+
+    #[test]
+    fn update_plan_is_empty_when_there_is_nothing_to_do() {
+        let nothing = UpdateRequest {
+            venv: Path::new("/work/proj/.venv"),
+            upgrade_pip: false,
+            upgrade_packages: true,
+            dependencies: None,
+        };
+
+        assert!(plan_update(Path::new("/work/proj"), &nothing).is_empty());
+    }
+
+    /// Builds `localpkg-<version>-py3-none-any.whl` with the interpreter's own
+    /// `zipfile`, so installing it needs no network and no build backend.
+    fn build_wheel(python: &Path, dir: &Path, version: &str) -> String {
+        let script = format!(
+            r#"
+version = "{version}"
+name = "localpkg-" + version + "-py3-none-any.whl"
+dist = "localpkg-" + version + ".dist-info"
+files = {{
+    "localpkg/__init__.py": "VERSION = " + repr(version) + "\n",
+    dist + "/METADATA": "Metadata-Version: 2.1\nName: localpkg\nVersion: " + version + "\n",
+    dist + "/WHEEL": "Wheel-Version: 1.0\nGenerator: test\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+}}
+files[dist + "/RECORD"] = "".join(path + ",,\n" for path in [*files, dist + "/RECORD"])
+import zipfile
+with zipfile.ZipFile(name, "w") as wheel:
+    for path, content in files.items():
+        wheel.writestr(path, content)
+print(name)
+"#
+        );
+        let output = Command::new(python)
+            .args(["-c", &script])
+            .current_dir(dir)
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{output:?}");
+        String::from_utf8(output.stdout).unwrap().trim().to_owned()
+    }
+
+    fn offline(mut steps: Vec<Step>) -> Vec<Step> {
+        for step in &mut steps {
+            step.env.push(("PIP_NO_INDEX".to_owned(), "1".into()));
+            step.env
+                .push(("PIP_DISABLE_PIP_VERSION_CHECK".to_owned(), "1".into()));
+        }
+        steps
+    }
+
+    fn installed_version(venv: &Path) -> String {
+        let output = Command::new(venv_python(venv))
+            .args(["-c", "import localpkg; print(localpkg.VERSION)"])
+            .output()
+            .unwrap();
+        String::from_utf8_lossy(&output.stdout).trim().to_owned()
+    }
+
+    /// Real pip, real venv, no network: the requirements move from version 1.0
+    /// to 2.0 of a local wheel and the update must install 2.0 in place.
+    #[test]
+    fn updating_installs_newer_packages_into_the_existing_venv() {
+        let Some(interpreter) = any_interpreter() else {
+            return;
+        };
+        let project = tempdir().unwrap();
+        let project_path = fs::canonicalize(project.path()).unwrap();
+        let v1 = build_wheel(&interpreter, &project_path, "1.0");
+        let v2 = build_wheel(&interpreter, &project_path, "2.0");
+        let requirements = project_path.join("requirements.txt");
+        fs::write(&requirements, format!("./{v1}\n")).unwrap();
+        let source = DependencySource::Requirements("requirements.txt".to_owned());
+        let created = run_steps(
+            &offline(plan_create(
+                &project_path,
+                &CreateRequest {
+                    name: ".venv",
+                    interpreter: &interpreter,
+                    dependencies: Some(&source),
+                },
+            )),
+            &mut Vec::new(),
+        );
+        assert_eq!(created.failed_step, None, "{}", created.summary);
+        let venv = project_path.join(".venv");
+        assert_eq!(installed_version(&venv), "1.0");
+
+        fs::write(&requirements, format!("./{v2}\n")).unwrap();
+        let steps = plan_update(
+            &project_path,
+            &UpdateRequest {
+                venv: &venv,
+                upgrade_pip: false,
+                upgrade_packages: true,
+                dependencies: Some(&source),
+            },
+        );
+        let updated = run_steps(&offline(steps), &mut Vec::new());
+
+        assert_eq!(updated.failed_step, None, "{}", updated.summary);
+        assert_eq!(installed_version(&venv), "2.0", "update must replace 1.0");
+
+        // A failing update reports its step and leaves the venv usable.
+        fs::write(&requirements, "./does-not-exist-1.0-py3-none-any.whl\n").unwrap();
+        let steps = plan_update(
+            &project_path,
+            &UpdateRequest {
+                venv: &venv,
+                upgrade_pip: false,
+                upgrade_packages: true,
+                dependencies: Some(&source),
+            },
+        );
+        let failed = run_steps(&offline(steps), &mut Vec::new());
+
+        assert_eq!(failed.failed_step, Some(0));
+        assert!(venv.join("pyvenv.cfg").is_file());
+        assert_eq!(installed_version(&venv), "2.0", "still the last good state");
     }
 
     #[test]
